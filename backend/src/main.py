@@ -38,3 +38,8 @@ app.include_router(challenges_router, prefix="/challenges", tags=["challenges"])
 app.include_router(visualizations_router, prefix="/visualizations", tags=["visualizations"])
 app.include_router(reports_router, prefix="/reports", tags=["reports"])
 app.include_router(extension_router, prefix="/extension", tags=["extension"])
+
+# WebSocket endpoint
+if settings.EXTENSION_WEBSOCKET_ENABLED:
+    from src.extension.websocket import websocket_endpoint
+    app.add_api_websocket_route("/ws/extension", websocket_endpoint)
