@@ -1,7 +1,7 @@
 from pydantic import PostgresDsn, field_validator
 from pydantic_settings import BaseSettings
 from typing import Literal, List
-import os
+
 
 class Settings(BaseSettings):
     """
@@ -43,7 +43,13 @@ class Settings(BaseSettings):
     
     # External Services
     SOCIAL_MEDIA_API_KEY: str | None = None
-    
+
+    # Extension feature flags and settings (added)
+    EXTENSION_ENABLED: bool = False
+    EXTENSION_WEBSOCKET_ENABLED: bool = False
+    EXTENSION_API_VERSION: str = "1.0"
+    EXTENSION_RATE_LIMIT: int = 100
+
     @field_validator("CORS_ORIGINS", mode="before")
     def parse_cors_origins(cls, value):
         """Parse CORS origins from string or list"""
@@ -55,6 +61,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
         extra = "ignore"
+
 
 # Global settings instance
 settings = Settings()
