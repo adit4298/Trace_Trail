@@ -43,3 +43,16 @@ app.include_router(extension_router, prefix="/extension", tags=["extension"])
 if settings.EXTENSION_WEBSOCKET_ENABLED:
     from src.extension.websocket import websocket_endpoint
     app.add_api_websocket_route("/ws/extension", websocket_endpoint)
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/hello")
+def hello():
+    return {"msg": "Demo working!", "status": "Backend is up"}
+@app.post("/test")
+def test(data: dict):
+    return {"received": data}
+
+
