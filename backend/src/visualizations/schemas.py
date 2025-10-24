@@ -16,3 +16,15 @@ class ChartData(BaseModel):
 class PrivacyTrendChart(BaseModel):
     data_points: List[DataPoint]
     trend: str
+
+
+class RiskBreakdownChart(BaseModel):
+    social_media: float
+    data_exposure: float
+    privacy_settings: float
+
+
+class PlatformDistribution(BaseModel):
+    platform: str
+    connection_count: int
+    risk_score: float
