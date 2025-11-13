@@ -1,0 +1,54 @@
+{
+  "risk_scorer": {
+    "model_type": "rule_based",
+    "version": "1.0",
+    "feature_weights": {
+      "privacy_setting": 0.30,
+      "post_frequency": 0.25,
+      "personal_info_exposure": 0.25,
+      "third_party_apps": 0.20
+    },
+    "thresholds": {
+      "low": 40,
+      "high": 70
+    }
+  },
+
+  "recommender": {
+    "version": "1.0",
+    "max_recommendations": 5,
+    "priority_weights": {
+      "high_impact": 3,
+      "medium_impact": 2,
+      "low_impact": 1
+    }
+  },
+
+  "anomaly_detector": {
+    "contamination": 0.1,
+    "model_type": "isolation_forest",
+    "n_estimators": 100
+  },
+
+  "trend_analyzer": {
+    "min_data_points": 2,
+    "prediction_window_days": [7, 30]
+  },
+
+  "feature_extractor": {
+    "feature_names": [
+      "user_age",
+      "account_age_days",
+      "total_connections",
+      "active_connections",
+      "public_ratio",
+      "friends_ratio",
+      "private_ratio",
+      "location_sharing_ratio",
+      "contact_sharing_ratio",
+      "avg_followers",
+      "avg_posts",
+      "avg_engagement"
+    ]
+  }
+}
