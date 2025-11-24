@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension Popup</title>
+    <link rel="stylesheet" href="../assets/styles/popup.css">
+</head>
+
+<body>
+    <div class="popup-container">
+        <header>
+            <h1>Extension Popup</h1>
+        </header>
+
+        <main>
+            <div class="content-section">
+                <p>Welcome to your Chrome extension!</p>
+
+                <div class="input-group">
+                    <label for="user-input">Enter something:</label>
+                    <input type="text" id="user-input" placeholder="Type here...">
+                </div>
+
+                <button id="save-btn" class="primary-btn">Save</button>
+                <button id="clear-btn" class="secondary-btn">Clear</button>
+
+                <div id="status-message"></div>
+            </div>
+
+            <div class="data-display">
+                <h3>Saved Data:</h3>
+                <div id="saved-data">No data saved yet</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../src/popup.js"></script>
+</body>
+
+</html>
