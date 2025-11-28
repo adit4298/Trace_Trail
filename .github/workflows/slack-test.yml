@@ -9,18 +9,14 @@ jobs:
     environment: production
 
     steps:
-      - name: Send Slack Test Message
+      - name: Send Slack Test Message (Safe JSON)
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data '{
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": ":tada: *Slack webhook test successful!*"
-                }
-              }
-            ]
-          }' \
-          "${{ secrets.SLACK_WEBHOOK }}"
+          cat <<EOF > payload.json
+          {
+            "text": "Slack test from GitHub Actions 🚀"
+          }
+          EOF
+
+          curl -X POST -H "Content-Type: application/json" \
+            --data @payload.json \
+            "${{ secrets.SLACK_WEBHOOK }}"
