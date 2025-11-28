@@ -7,9 +7,10 @@ jobs:
   send-test-message:
     runs-on: ubuntu-latest
     environment: production
+
     steps:
       - name: Send Slack Test Message
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":"✅ Slack webhook test successful! (GitHub → Slack)"}' \
-          ${{ secrets.SLACK_WEBHOOK }}
+          --data '{"text": "Slack test from GitHub Actions 🚀"}' \
+          "${{ secrets.SLACK_WEBHOOK }}"
