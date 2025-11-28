@@ -119,7 +119,7 @@ jobs:
   build-images:
     needs: [backend-tests, frontend-tests, ai-tests]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Set up Docker Buildx
@@ -155,7 +155,7 @@ jobs:
   deploy:
     needs: [build-images]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Configure kubectl
