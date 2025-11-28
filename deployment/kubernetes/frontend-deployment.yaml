@@ -15,47 +15,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: tracetrail/frontend:latest
-          ports:
-            - containerPort: 80
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 5
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-  namespace: tracetrail
-  labels:
-    app: frontend
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-        - name: frontend
           image: ghcr.io/your-org/tracetrail-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
@@ -69,7 +28,7 @@ spec:
               memory: 256Mi
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -79,29 +38,3 @@ spec:
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 15
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend
-  namespace: tracetrail
-spec:
-  selector:
-    app: frontend
-  ports:
-    - port: 80
-      targetPort: 80
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-  namespace: tracetrail
-spec:
-  selector:
-    app: frontend
-  ports:
-    - port: 80
-      targetPort: 80
-  type: ClusterIP

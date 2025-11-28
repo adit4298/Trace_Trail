@@ -1,1 +1,42 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "scripts/**"
+      - "deployment/**"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "scripts/**"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          cd backend
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements/base.txt
+      - name: Run backend tests
+        env:
+          DATABASE_URL: postgresql+psycopg://test_user:test_password@localhost:5432/test_db
+        run: bash scripts/testing/run_backend_tests.sh
 

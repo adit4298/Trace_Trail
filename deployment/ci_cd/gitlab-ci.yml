@@ -6,17 +6,14 @@ stages:
 variables:
   REGISTRY: $CI_REGISTRY_IMAGE
 
-.setup-node-python: &setup-node-python |
-  apt-get update && \
-  apt-get install -y python3 python3-venv python3-pip curl ca-certificates nodejs npm && \
-  ln -sf /usr/bin/python3 /usr/bin/python && \
-  npm install -g npm@latest
+.setup:
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update && apt-get install -y curl python3 python3-venv python3-pip nodejs npm
 
 test:
   stage: test
-  image: ubuntu:22.04
-  before_script:
-    - *setup-node-python
+  extends: .setup
   script:
     - bash scripts/ci_cd/test.sh
 
@@ -48,16 +45,17 @@ deploy:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
     - kubectl apply -f deployment/kubernetes/service.yaml
-    - kubectl set image deployment/backend backend=$REGISTRY/backend:$CI_COMMIT_SHA -n tracetrail
-    - kubectl set image deployment/frontend frontend=$REGISTRY/frontend:$CI_COMMIT_SHA -n tracetrail
-    - kubectl set image deployment/ai-module ai-module=$REGISTRY/ai:$CI_COMMIT_SHA -n tracetrail
     - kubectl apply -f deployment/kubernetes/postgres-deployment.yaml
-    - kubectl apply -f deployment/kubernetes/backend-deployment.yaml
-    - kubectl apply -f deployment/kubernetes/frontend-deployment.yaml
-    - kubectl apply -f deployment/kubernetes/ai-deployment.yaml
+    - kubectl set image deployment/backend backend=$REGISTRY/backend:$CI_COMMIT_SHA -n tracetrail --record || \
+        kubectl apply -f deployment/kubernetes/backend-deployment.yaml
+    - kubectl set image deployment/frontend frontend=$REGISTRY/frontend:$CI_COMMIT_SHA -n tracetrail --record || \
+        kubectl apply -f deployment/kubernetes/frontend-deployment.yaml
+    - kubectl set image deployment/ai-module ai-module=$REGISTRY/ai:$CI_COMMIT_SHA -n tracetrail --record || \
+        kubectl apply -f deployment/kubernetes/ai-deployment.yaml
     - kubectl apply -f deployment/kubernetes/ingress.yaml
   environment:
     name: production
     url: https://app.tracetrail.com
   only:
     - main
+

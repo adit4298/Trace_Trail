@@ -19,25 +19,22 @@ spec:
         - name: backend
           image: ghcr.io/your-org/tracetrail-backend:latest
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: tracetrail-secrets
+                  key: DATABASE_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tracetrail-secrets
+                  key: SECRET_KEY
           envFrom:
             - configMapRef:
                 name: tracetrail-config
-            - secretRef:
-                name: tracetrail-secrets
-          readinessProbe:
-            httpGet:
-              path: /hello
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            httpGet:
-              path: /hello
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 15
+          ports:
+            - containerPort: 8000
           resources:
             requests:
               cpu: 250m
@@ -45,16 +42,15 @@ spec:
             limits:
               cpu: 500m
               memory: 1Gi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-  namespace: tracetrail
-spec:
-  selector:
-    app: backend
-  ports:
-    - name: http
-      port: 8000
-      targetPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 15

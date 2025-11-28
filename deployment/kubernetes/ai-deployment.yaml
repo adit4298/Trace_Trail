@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: ai-module
   namespace: tracetrail
-  labels:
-    app: ai-module
 spec:
   replicas: 1
   selector:
@@ -19,45 +17,21 @@ spec:
         - name: ai-module
           image: ghcr.io/your-org/tracetrail-ai:latest
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8100
           env:
             - name: BACKEND_URL
               value: http://backend.tracetrail.svc.cluster.local:8000
-            - name: MODEL_CONFIG_PATH
-              value: config/model_config.json
-            - name: DATASET_PATH
-              value: data/datasets
-            - name: AI_API_PORT
-              value: "8100"
+          ports:
+            - containerPort: 8100
           readinessProbe:
             httpGet:
-              path: /docs
+              path: /
               port: 8100
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /docs
+              path: /
               port: 8100
             initialDelaySeconds: 30
             periodSeconds: 30
-          resources:
-            requests:
-              cpu: 250m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ai-module
-  namespace: tracetrail
-spec:
-  selector:
-    app: ai-module
-  ports:
-    - port: 8100
-      targetPort: 8100
+

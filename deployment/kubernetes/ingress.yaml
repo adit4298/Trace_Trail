@@ -23,7 +23,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend-service
+                name: frontend
                 port:
                   number: 80
     - host: www.tracetrail.com
@@ -34,42 +34,6 @@ spec:
             backend:
               service:
                 name: frontend-service
-                port:
-                  number: 80
-    - host: api.tracetrail.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: backend-service
-                port:
-                  number: 8000
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: tracetrail
-  namespace: tracetrail
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
-    nginx.ingress.kubernetes.io/websocket-services: backend
-spec:
-  tls:
-    - hosts:
-        - app.tracetrail.com
-        - api.tracetrail.com
-      secretName: tracetrail-tls
-  rules:
-    - host: app.tracetrail.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
                 port:
                   number: 80
     - host: api.tracetrail.com

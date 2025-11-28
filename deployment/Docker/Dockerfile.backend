@@ -1,9 +1,11 @@
+# Backend Dockerfile used by Docker Compose, CI builds and production deployments
+
 FROM python:3.11-slim AS runtime
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PYTHONPATH=/app
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
@@ -11,10 +13,18 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential curl && \
     rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements/base.txt /tmp/requirements.txt
-RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+COPY backend/requirements/base.txt requirements.txt
+COPY backend/requirements/dev.txt dev-requirements.txt
 
-COPY backend /app
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi && \
+    rm -f requirements.txt dev-requirements.txt
+
+COPY backend/alembic alembic
+COPY backend/alembic.ini .
+COPY backend/src ./src
+COPY backend/scripts ./scripts
 
 RUN useradd -r -u 1001 tracetrail && chown -R tracetrail:tracetrail /app
 USER tracetrail
