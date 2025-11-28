@@ -1,1 +1,49 @@
+name: Trace Trail CI
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            backend/.venv
+            ai_module/.venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/*.txt', 'ai_module/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev
+
+      - name: Build artifacts
+        run: bash scripts/ci_cd/build.sh
+
+      - name: Run automated tests
+        run: bash scripts/ci_cd/test.sh
