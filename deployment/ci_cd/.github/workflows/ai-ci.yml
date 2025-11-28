@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: TraceTrail Deployment
 
 on:
   push:
@@ -6,165 +6,89 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  REGISTRY: ghcr.io/${{ github.repository_owner }}/tracetrail
+
 jobs:
-  # Backend Tests
-  backend-tests:
+  test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Cache dependencies
-        uses: actions/cache@v3
+      - uses: actions/setup-node@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-      - name: Run linter
-        run: |
-          cd backend
-          pylint app/ --fail-under=8.0
-      - name: Run tests
-        env:
-          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-          REDIS_URL: redis://localhost:6379/0
-        run: |
-          cd backend
-          pytest tests/ -v --cov=app --cov-report=xml
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./backend/coverage.xml
-          flags: backend
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Run project test suite
+        run: bash scripts/ci_cd/test.sh
 
-  # Frontend Tests
-  frontend-tests:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
-      - name: Run linter
-        run: |
-          cd frontend
-          npm run lint
-      - name: Run tests
-        run: |
-          cd frontend
-          npm run test -- --coverage
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./frontend/coverage/lcov.info
-          flags: frontend
-
-  # AI Module Tests
-  ai-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          cd ai-module
-          pip install -r requirements.txt
-      - name: Run tests
-        run: |
-          cd ai-module
-          pytest tests/ -v --cov=app
-
-  # Build Docker Images
-  build-images:
-    needs: [backend-tests, frontend-tests, ai-tests]
-    runs-on: ubuntu-latest
+    needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push Backend
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: deployment/docker/backend.Dockerfile
-          push: true
-          tags: tracetrail/backend:latest,tracetrail/backend:${{ github.sha }}
-      - name: Build and push Frontend
-        uses: docker/build-push-action@v4
+          registry: ghcr.io
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Build & push backend
+        uses: docker/build-push-action@v5
         with:
           context: .
-          file: deployment/docker/frontend.Dockerfile
+          file: deployment/Docker/Dockerfile.backend
           push: true
-          tags: tracetrail/frontend:latest,tracetrail/frontend:${{ github.sha }}
-      - name: Build and push AI Module
-        uses: docker/build-push-action@v4
+          tags: |
+            ${{ env.REGISTRY }}-backend:latest
+            ${{ env.REGISTRY }}-backend:${{ github.sha }}
+      - name: Build & push frontend
+        uses: docker/build-push-action@v5
         with:
           context: .
-          file: deployment/docker/ai-module.Dockerfile
+          file: deployment/Docker/Dockerfile.frontend
           push: true
-          tags: tracetrail/ai-module:latest,tracetrail/ai-module:${{ github.sha }}
+          tags: |
+            ${{ env.REGISTRY }}-frontend:latest
+            ${{ env.REGISTRY }}-frontend:${{ github.sha }}
+      - name: Build & push AI module
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: deployment/Docker/Dockerfile.ai
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}-ai:latest
+            ${{ env.REGISTRY }}-ai:${{ github.sha }}
 
-  # Deploy to Kubernetes
   deploy:
-    needs: [build-images]
     runs-on: ubuntu-latest
+    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v3
-      - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
-      - name: Deploy to Kubernetes
+      - name: Apply shared resources
         run: |
-          kubectl apply -f deployment/k8s/
-          kubectl rollout status deployment/backend -n tracetrail
-          kubectl rollout status deployment/frontend -n tracetrail
+          kubectl apply -f deployment/kubernetes/service.yaml
+          kubectl apply -f deployment/kubernetes/postgres-deployment.yaml
+      - name: Deploy workloads
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          kubectl set image deployment/backend backend=${{ env.REGISTRY }}-backend:${SHA} -n tracetrail --record || \
+            kubectl apply -f deployment/kubernetes/backend-deployment.yaml
+          kubectl set image deployment/frontend frontend=${{ env.REGISTRY }}-frontend:${SHA} -n tracetrail --record || \
+            kubectl apply -f deployment/kubernetes/frontend-deployment.yaml
+          kubectl set image deployment/ai-module ai-module=${{ env.REGISTRY }}-ai:${SHA} -n tracetrail --record || \
+            kubectl apply -f deployment/kubernetes/ai-deployment.yaml
+          kubectl apply -f deployment/kubernetes/ingress.yaml

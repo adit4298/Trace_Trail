@@ -1,1 +1,63 @@
+stages:
+  - test
+  - build
+  - deploy
 
+variables:
+  REGISTRY: $CI_REGISTRY_IMAGE
+
+.setup-node-python: &setup-node-python |
+  apt-get update && \
+  apt-get install -y python3 python3-venv python3-pip curl ca-certificates nodejs npm && \
+  ln -sf /usr/bin/python3 /usr/bin/python && \
+  npm install -g npm@latest
+
+test:
+  stage: test
+  image: ubuntu:22.04
+  before_script:
+    - *setup-node-python
+  script:
+    - bash scripts/ci_cd/test.sh
+
+build:
+  stage: build
+  image: docker:24-git
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -f deployment/Docker/Dockerfile.backend -t "$REGISTRY/backend:$CI_COMMIT_SHA" .
+    - docker build -f deployment/Docker/Dockerfile.frontend -t "$REGISTRY/frontend:$CI_COMMIT_SHA" .
+    - docker build -f deployment/Docker/Dockerfile.ai -t "$REGISTRY/ai:$CI_COMMIT_SHA" .
+    - docker push "$REGISTRY/backend:$CI_COMMIT_SHA"
+    - docker push "$REGISTRY/frontend:$CI_COMMIT_SHA"
+    - docker push "$REGISTRY/ai:$CI_COMMIT_SHA"
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:1.30
+    entrypoint: [""]
+  script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - kubectl apply -f deployment/kubernetes/service.yaml
+    - kubectl set image deployment/backend backend=$REGISTRY/backend:$CI_COMMIT_SHA -n tracetrail
+    - kubectl set image deployment/frontend frontend=$REGISTRY/frontend:$CI_COMMIT_SHA -n tracetrail
+    - kubectl set image deployment/ai-module ai-module=$REGISTRY/ai:$CI_COMMIT_SHA -n tracetrail
+    - kubectl apply -f deployment/kubernetes/postgres-deployment.yaml
+    - kubectl apply -f deployment/kubernetes/backend-deployment.yaml
+    - kubectl apply -f deployment/kubernetes/frontend-deployment.yaml
+    - kubectl apply -f deployment/kubernetes/ai-deployment.yaml
+    - kubectl apply -f deployment/kubernetes/ingress.yaml
+  environment:
+    name: production
+    url: https://app.tracetrail.com
+  only:
+    - main
