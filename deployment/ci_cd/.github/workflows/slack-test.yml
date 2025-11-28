@@ -1,12 +1,12 @@
 name: Slack Webhook Test
 
 on:
-  workflow_dispatch:   # allows you to run manually
+  workflow_dispatch:
 
 jobs:
   send-test-message:
     runs-on: ubuntu-latest
-    environment: production    # because your SLACK_WEBHOOK is in this environment
+    environment: production
     steps:
       - name: Send Slack Test Message
         run: |
