@@ -1,6 +1,54 @@
 name: Backend CI
 
 on:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/dev.txt
+          pip install -e .
+
+      - name: Lint (black)
+        run: black --check src tests
+
+      - name: Lint (isort)
+        run: isort --check-only src tests
+
+      - name: Flake8
+        run: flake8 src tests
+
+      - name: Type check
+        run: mypy src
+
+      - name: Tests
+        env:
+          DATABASE_URL: sqlite:///./test.db
+          SECRET_KEY: "ci-secret"
+        run: python -m pytest tests -q
+name: Backend CI
+
+on:
   pull_request:
     paths:
       - "backend/**"
