@@ -29,32 +29,34 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
         <span className="text-xs font-medium text-muted">Updated moments ago</span>
       </header>
 
-      <ol className="relative space-y-6 border-l border-border/60 pl-6">
+      <ol className="space-y-6">
         {activities.map((activity, index) => (
-          <li key={activity.id} className="relative space-y-2">
+          <li key={activity.id} className="relative border-l border-border/60 pl-6">
             <span
               className={clsx(
-                'absolute -left-[10px] mt-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold',
+                'absolute -left-[11px] top-3 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold',
                 stateColorMap[activity.state]
               )}
               aria-hidden="true"
             >
               {index + 1}
             </span>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-              <span className="font-semibold text-foreground">{activity.actor}</span>
-              <span aria-hidden="true">•</span>
-              <span>
-                {formatDistanceToNow(new Date(activity.timestamp), {
-                  addSuffix: true
-                })}
-              </span>
-              <span className="rounded-full bg-background/70 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                {activity.state}
-              </span>
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                <span className="font-semibold text-foreground">{activity.actor}</span>
+                <span aria-hidden="true">•</span>
+                <span>
+                  {formatDistanceToNow(new Date(activity.timestamp), {
+                    addSuffix: true
+                  })}
+                </span>
+                <span className="rounded-full bg-background/70 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                  {activity.state}
+                </span>
+              </div>
+              <p className="text-sm text-foreground">{activity.action}</p>
+              <p className="text-xs text-muted">{activity.context}</p>
             </div>
-            <p className="text-sm text-foreground">{activity.action}</p>
-            <p className="text-xs text-muted">{activity.context}</p>
           </li>
         ))}
       </ol>
