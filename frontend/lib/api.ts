@@ -1,15 +1,14 @@
 import 'server-only';
 
-import type { NextFetchRequestConfig } from 'next/server';
-
 import type { DashboardSnapshot } from '@/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-type FetchOptions = RequestInit &
-  Pick<NextFetchRequestConfig, 'revalidate' | 'tags'> & {
-    cache?: RequestCache;
-  };
+type FetchOptions = RequestInit & {
+  cache?: RequestCache;
+  revalidate?: number | false;
+  tags?: string[];
+};
 
 export async function fetchJson<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { revalidate, tags, ...rest } = options;

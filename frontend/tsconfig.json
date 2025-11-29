@@ -15,7 +15,7 @@
     "noEmit": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["jest", "node"],
+    "types": ["react", "react-dom", "jest", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
