@@ -2,9 +2,10 @@
 Tests for DataGenerator.
 """
 
-import pytest
-from data.data_generator import DataGenerator
 import pandas as pd
+import pytest
+
+from ai_module.data.data_generator import DataGenerator
 
 @pytest.fixture
 def data_generator():

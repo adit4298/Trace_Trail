@@ -3,7 +3,8 @@ Tests for RiskScorer.
 """
 
 import pytest
-from models.risk_scorer import RiskScorer
+
+from ai_module.models.risk_scorer import RiskScorer
 
 @pytest.fixture
 def risk_scorer():

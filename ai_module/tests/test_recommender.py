@@ -3,7 +3,8 @@ Tests for Recommender.
 """
 
 import pytest
-from models.recommender import Recommender
+
+from ai_module.models.recommender import Recommender
 
 @pytest.fixture
 def recommender():
