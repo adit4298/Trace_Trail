@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -15,11 +19,24 @@
     "noEmit": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["react", "react-dom", "jest", "node"],
+    "types": [
+      "react",
+      "react-dom",
+      "jest",
+      "node"
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ]
+    },
+    "esModuleInterop": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",

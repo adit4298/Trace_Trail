@@ -18,3 +18,13 @@ async def health_check(settings: Settings = Depends(get_settings)):
         "environment": settings.ENVIRONMENT,
     }
 
+
+@router.get("/")
+async def root(settings: Settings = Depends(get_settings)):
+    return {
+        "status": "ok",
+        "message": "TraceTrail backend is running",
+        "version": settings.APP_VERSION,
+        "docs": "/docs" if settings.SHOW_DOCS else None,
+    }
+
