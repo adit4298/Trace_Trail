@@ -815,6 +815,9 @@ select {
 .flex-col {
   flex-direction: column;
 }
+.items-end {
+  align-items: flex-end;
+}
 .items-center {
   align-items: center;
 }
@@ -883,6 +886,9 @@ select {
 }
 .border-white\/10 {
   border-color: rgb(255 255 255 / 0.1);
+}
+.border-white\/15 {
+  border-color: rgb(255 255 255 / 0.15);
 }
 .border-white\/5 {
   border-color: rgb(255 255 255 / 0.05);
@@ -988,9 +994,6 @@ select {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
-.text-right {
-  text-align: right;
-}
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -1023,6 +1026,9 @@ select {
 }
 .uppercase {
   text-transform: uppercase;
+}
+.capitalize {
+  text-transform: capitalize;
 }
 .tracking-\[0\.4em\] {
   letter-spacing: 0.4em;
@@ -1149,6 +1155,10 @@ body {
 
 .hover\:border-white\/30:hover {
   border-color: rgb(255 255 255 / 0.3);
+}
+
+.hover\:border-white\/35:hover {
+  border-color: rgb(255 255 255 / 0.35);
 }
 
 .hover\:bg-white\/20:hover {
