@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # Middleware / HTTP concerns
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: List[str] | str = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
@@ -67,6 +67,14 @@ class Settings(BaseSettings):
     def parse_cors_origins(cls, value):
         """Parse CORS origins from string or list."""
         if isinstance(value, str):
+            value = value.strip()
+            if value.startswith("["):
+                import json
+
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError:
+                    pass
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
