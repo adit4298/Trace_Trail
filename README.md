@@ -19,6 +19,6 @@ Each subsystem ships with its own README containing setup instructions. At a gla
 | --- | --- | --- |
 | `frontend/` | `npm run dev` | `npm run test`, `npm run test:e2e` |
 | `backend/` | `uvicorn src.main:app --reload` | `pytest` |
-| `ai_module/` | `uvicorn main:app --reload --app-dir ai_module` (Prometheus metrics via `/metrics`) | `pytest` |
+| `ai_module/` | `uvicorn ai_module.main:app --reload --app-dir ai_module` (Prometheus metrics via `/metrics`) | `pytest` |
 
 Use the top-level `docker-compose.yml` or scripts under `scripts/` for local orchestration once all services are configured.

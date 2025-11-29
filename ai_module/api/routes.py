@@ -57,9 +57,9 @@ async def calculate_risk_score(
     try:
         logger.info("Calculating risk score for user_id=%s", request.user_id)
         result = pipeline.score_user(
-            user_data=request.user_data.model_dump(),
-            connections=[c.model_dump() for c in request.connections],
-            activities=[a.model_dump() for a in request.activities] if request.activities else None
+            user_data=request.user_data.model_dump(exclude_none=True),
+            connections=[c.model_dump(exclude_none=True) for c in request.connections],
+            activities=[a.model_dump(exclude_none=True) for a in request.activities] if request.activities else None
         )
         return RiskScoreResponse(user_id=request.user_id, **result)
 
@@ -90,7 +90,7 @@ async def get_recommendations(
         recommendations = pipeline.recommend(
             risk_score=request.risk_score,
             risk_breakdown=request.risk_breakdown,
-            connections=[c.model_dump() for c in request.connections],
+            connections=[c.model_dump(exclude_none=True) for c in request.connections],
             max_recommendations=request.max_recommendations
         )
         return [RecommendationResponse(**rec) for rec in recommendations]
@@ -119,7 +119,7 @@ async def analyze_trend(
     """
     try:
         logger.info("Analyzing trend for user_id=%s", request.user_id)
-        result = pipeline.analyze_trends([s.model_dump() for s in request.score_history])
+        result = pipeline.analyze_trends([s.model_dump(exclude_none=True) for s in request.score_history])
         return TrendAnalysisResponse(user_id=request.user_id, **result)
 
     except Exception as e:

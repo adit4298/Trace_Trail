@@ -21,7 +21,7 @@ Privacy-risk analytics, anomaly detection, and recommendation services that powe
 cd ai_module
 python -m venv .venv && source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8082
+uvicorn ai_module.main:app --reload --host 0.0.0.0 --port 8082
 ```
 
 Environment variables (all prefixed with `AI_`) can be added to `.env`. Useful ones:

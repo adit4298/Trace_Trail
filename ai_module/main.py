@@ -8,10 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 
-from api.routes import router
-from config.settings import get_settings
-from observability import metrics_endpoint, metrics_middleware
-from utils.logger import get_logger
+from ai_module.api.routes import router
+from ai_module.config.settings import get_settings
+from ai_module.observability import metrics_endpoint, metrics_middleware
+from ai_module.utils.logger import get_logger
 
 # Initialize settings and logger
 settings = get_settings()

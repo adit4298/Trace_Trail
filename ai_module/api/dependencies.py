@@ -14,13 +14,13 @@ logger = get_logger(__name__)
 
 
 @lru_cache(maxsize=1)
-def _pipeline_factory(settings: Settings) -> AIPipeline:
-    return AIPipeline(settings=settings)
+def _pipeline_factory() -> AIPipeline:
+    return AIPipeline(settings=get_settings())
 
 
-def get_pipeline(settings: Settings = Depends(get_settings)) -> AIPipeline:
+def get_pipeline() -> AIPipeline:
     """Provide a singleton pipeline instance to route handlers."""
-    return _pipeline_factory(settings)
+    return _pipeline_factory()
 
 
 async def verify_api_key(x_api_key: str | None = Header(default=None)) -> None:
