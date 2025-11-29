@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --color-background: 247 248 252;
+  --color-surface: 255 255 255;
+  --color-muted: 100 116 139;
+  --color-foreground: 15 23 42;
+  --color-primary: 99 102 241;
+  --color-primary-foreground: 255 255 255;
+  --color-border: 227 229 235;
+  --color-success: 34 197 94;
+  --color-warning: 245 158 11;
+  --color-danger: 239 68 68;
+  --shadow-soft: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+}
+
+[data-theme='dark'] {
+  --color-background: 15 23 42;
+  --color-surface: 30 41 59;
+  --color-muted: 148 163 184;
+  --color-foreground: 226 232 240;
+  --color-primary: 94 234 212;
+  --color-primary-foreground: 15 23 42;
+  --color-border: 51 65 85;
+  --color-success: 34 197 94;
+  --color-warning: 249 115 22;
+  --color-danger: 248 113 113;
+  --shadow-soft: 0 20px 45px -24px rgba(15, 23, 42, 0.65);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  ::selection {
+    background-color: rgb(var(--color-primary) / 0.25);
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -40px;
+    z-index: 999;
+    border-radius: 0.5rem;
+    background-color: rgb(var(--color-primary));
+    color: rgb(var(--color-primary-foreground));
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    transition: top 150ms ease;
+  }
+
+  .skip-link:focus-visible {
+    top: 1rem;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 3px;
+}
+
