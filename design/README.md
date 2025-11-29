@@ -38,6 +38,12 @@ All assets are production-ready and optimized for:
 - Mobile (1x, 2x, 3x density)
 - Print (CMYK, 300dpi)
 
+## Premium dashboard reference build (2025)
+A complete Next.js + Tailwind implementation of the TraceTrail premium dashboard lives in
+`design/ui-dashboard`. It demonstrates the latest 2025 design language (glassmorphism, soft depth,
+responsive grid, adaptive typography) and can be used as the canonical reference for future product
+screens. See the README in that folder for build instructions (`npm install && npm run dev`).
+
 ## Tools & Software
 - **Design**: Figma (primary), Adobe XD (backup)
 - **Illustration**: Adobe Illustrator
