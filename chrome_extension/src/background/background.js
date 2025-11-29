@@ -267,7 +267,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   monitoringSessions.delete(tabId);
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
   if (changeInfo.status === 'complete' && monitoringSessions.has(tabId)) {
     // Reinject content script if needed
     console.log('Tab updated, checking monitoring session');
