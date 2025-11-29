@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import List, Literal
 
-from pydantic import PostgresDsn, field_validator
+from pydantic import PostgresDsn, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,7 +21,12 @@ class Settings(BaseSettings):
     SHOW_DOCS: bool = True
 
     # Database Configuration
-    DATABASE_URL: PostgresDsn = PostgresDsn("postgresql+psycopg2://postgres:postgres@localhost:5432/postgres")
+    DB_USER: str = "postgres"
+    DB_PASSWORD: SecretStr = SecretStr("postgres")
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
+    DB_NAME: str = "trace_trail"
+    DATABASE_URL: PostgresDsn | None = None
     DB_ECHO: bool = False  # Set to True for SQL query logging
 
     # Security Settings
@@ -64,6 +69,19 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
+
+    @model_validator(mode="after")
+    def assemble_database_url(self):
+        if not self.DATABASE_URL:
+            self.DATABASE_URL = PostgresDsn.build(
+                scheme="postgresql+psycopg2",
+                username=self.DB_USER,
+                password=self.DB_PASSWORD.get_secret_value(),
+                host=self.DB_HOST,
+                port=str(self.DB_PORT),
+                path=f"/{self.DB_NAME}",
+            )
+        return self
 
 
 @lru_cache(maxsize=1)
