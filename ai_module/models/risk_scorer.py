@@ -1,7 +1,10 @@
-import numpy as np
-from typing import Dict, Any, List
-from sklearn.ensemble import RandomForestRegressor
 import logging
+from pathlib import Path
+from typing import Dict, Any, List, Optional
+
+import joblib
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +25,38 @@ class RiskScorer:
         'third_party_apps': 0.20
     }
 
-    def __init__(self, model_type: str = 'rule_based'):
+    def __init__(
+        self,
+        model_type: str = 'rule_based',
+        feature_weights: Optional[Dict[str, float]] = None,
+        thresholds: Optional[Dict[str, float]] = None,
+        model_checkpoint: Optional[str] = None
+    ):
         self.model_type = model_type
         self.model = None
+        self.is_trained = False
+        self.feature_weights = self._normalize_feature_weights(
+            feature_weights or self.FEATURE_WEIGHTS
+        )
+        threshold_config = thresholds or {'low': 40, 'high': 70}
+        self.threshold_low = threshold_config.get('low', 40)
+        self.threshold_high = threshold_config.get('high', 70)
         if model_type == 'ml':
-            self.model = RandomForestRegressor(n_estimators=100, random_state=42)
-        logger.info(f"RiskScorer initialized with model_type={model_type}")
+            if model_checkpoint:
+                checkpoint_path = Path(model_checkpoint)
+                if checkpoint_path.exists():
+                    self.model = joblib.load(checkpoint_path)
+                    self.is_trained = True
+                    logger.info("Loaded trained risk scorer from %s", checkpoint_path)
+                else:
+                    logger.warning("Checkpoint %s not found, falling back to fresh model", checkpoint_path)
+            if self.model is None:
+                self.model = RandomForestRegressor(n_estimators=200, random_state=42)
+        logger.info(
+            "RiskScorer initialized model_type=%s thresholds=%s",
+            model_type,
+            threshold_config
+        )
 
     def calculate_risk_score(
         self,
@@ -49,10 +78,10 @@ class RiskScorer:
         app_score = self._calculate_third_party_apps_score(connections)
 
         overall_score = (
-            privacy_score * self.FEATURE_WEIGHTS['privacy_setting'] +
-            frequency_score * self.FEATURE_WEIGHTS['post_frequency'] +
-            exposure_score * self.FEATURE_WEIGHTS['personal_info_exposure'] +
-            app_score * self.FEATURE_WEIGHTS['third_party_apps']
+            privacy_score * self.feature_weights['privacy_setting'] +
+            frequency_score * self.feature_weights['post_frequency'] +
+            exposure_score * self.feature_weights['personal_info_exposure'] +
+            app_score * self.feature_weights['third_party_apps']
         )
 
         category = self._get_risk_category(overall_score)
@@ -134,9 +163,9 @@ class RiskScorer:
         return 50.0
 
     def _get_risk_category(self, score: float) -> str:
-        if score >= 71:
+        if score >= self.threshold_high:
             return 'high'
-        elif score >= 41:
+        elif score >= self.threshold_low:
             return 'medium'
         else:
             return 'low'
@@ -155,10 +184,18 @@ class RiskScorer:
             logger.warning("Cannot train rule-based model")
             return
         self.model.fit(X, y)
+        self.is_trained = True
         logger.info(f"Model trained on {len(X)} samples")
 
     def predict_ml(self, features: np.ndarray) -> float:
-        if self.model is None:
+        if self.model is None or not self.is_trained:
             raise ValueError("Model not trained")
         prediction = self.model.predict(features.reshape(1, -1))[0]
         return max(0, min(100, prediction))
+
+    @staticmethod
+    def _normalize_feature_weights(weights: Dict[str, float]) -> Dict[str, float]:
+        total = sum(weights.values())
+        if not total:
+            return RiskScorer.FEATURE_WEIGHTS.copy()
+        return {key: value / total for key, value in weights.items()}

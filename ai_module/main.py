@@ -10,11 +10,12 @@ import logging
 
 from api.routes import router
 from config.settings import get_settings
+from observability import metrics_endpoint, metrics_middleware
 from utils.logger import get_logger
 
 # Initialize settings and logger
 settings = get_settings()
-logger = get_logger(__name__, level=settings.log_level)
+logger = get_logger(__name__, level=settings.log_level, log_dir=settings.log_dir)
 
 # Create FastAPI app
 app = FastAPI(
@@ -36,6 +37,8 @@ app.add_middleware(
 
 # Include routers
 app.include_router(router)
+app.add_api_route("/metrics", metrics_endpoint, methods=["GET"], tags=["Observability"])
+app.middleware("http")(metrics_middleware)
 
 @app.on_event("startup")
 async def startup_event():

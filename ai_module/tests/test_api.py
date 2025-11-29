@@ -55,6 +55,8 @@ def test_risk_score_endpoint():
     assert "overall_score" in data
     assert "category" in data
     assert "breakdown" in data
+    assert "anomaly_summary" in data
+    assert "feature_snapshot" in data
 
 def test_recommendations_endpoint():
     """Test recommendations endpoint."""
@@ -92,3 +94,10 @@ def test_recommendations_endpoint():
     data = response.json()
     assert isinstance(data, list)
     assert len(data) <= 5
+
+
+def test_metrics_endpoint():
+    """Metrics endpoint should expose Prometheus text."""
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "ai_module_request_total" in response.text

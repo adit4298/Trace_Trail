@@ -6,12 +6,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 class TrendAnalyzer:
-    """Analyze trends in privacy risk scores over time. """
+    """Analyze trends in privacy risk scores over time."""
 
-    def __init__(self):
-        """Initialize trend analyzer. """
+    def __init__(self, min_data_points: int = 2, prediction_windows: List[int] | None = None):
+        """Initialize trend analyzer."""
         self.model = LinearRegression()
-        logger.info("TrendAnalyzer initialized")
+        self.min_data_points = max(2, min_data_points)
+        self.prediction_windows = prediction_windows or [7, 30]
+        logger.info(
+            "TrendAnalyzer initialized (min_points=%s, windows=%s)",
+            self.min_data_points,
+            self.prediction_windows
+        )
 
     def analyze_trend(
         self,
@@ -27,7 +33,7 @@ class TrendAnalyzer:
         Returns:
             Dictionary with trend analysis
         """
-        if len(score_history) < 2:
+        if len(score_history) < self.min_data_points:
             return {
                 'trend': 'insufficient_data',
                 'direction': 'stable',
@@ -71,19 +77,17 @@ class TrendAnalyzer:
         # Make predictions
         current_days = X[-1][0]
 
-        pred_7d = self.model.predict([[current_days + 7]])[0]
-        pred_30d = self.model.predict([[current_days + 30]])[0]
-
-        # Clip predictions to valid range
-        pred_7d = max(0, min(100, pred_7d))
-        pred_30d = max(0, min(100, pred_30d))
+        predictions: Dict[int, float] = {}
+        for window in self.prediction_windows:
+            raw_pred = self.model.predict([[current_days + window]])[0]
+            predictions[window] = max(0, min(100, raw_pred))
 
         return {
             'trend': trend,
             'direction': direction,
             'rate_of_change': float(slope),
-            'predicted_score_7d': round(pred_7d, 2),
-            'predicted_score_30d': round(pred_30d, 2),
+            'predicted_score_7d': round(predictions.get(7), 2) if 7 in predictions else None,
+            'predicted_score_30d': round(predictions.get(30), 2) if 30 in predictions else None,
             'data_points': len(score_history)
         }
 

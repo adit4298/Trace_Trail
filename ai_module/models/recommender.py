@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,17 +71,19 @@ class Recommender:
         }
     }
 
-    def __init__(self):
-        logger.info("Recommender initialized")
+    def __init__(self, default_limit: int = 5):
+        self.default_limit = default_limit
+        logger.info("Recommender initialized (default_limit=%s)", default_limit)
 
     def generate_recommendations(
         self,
         risk_score: float,
         risk_breakdown: Dict[str, float],
         connections: List[Dict[str, Any]],
-        max_recommendations: int = 5
+        max_recommendations: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         recommendations = []
+        limit = max_recommendations or self.default_limit
 
         # Determine risk category
         if risk_score >= 71:
@@ -101,7 +103,7 @@ class Recommender:
 
         # Add general recommendations
         for key, rec in base_recs.items():
-            if len(recommendations) >= max_recommendations:
+            if len(recommendations) >= limit:
                 break
             recommendations.append({
                 'id': key,
@@ -115,7 +117,7 @@ class Recommender:
 
         # Sort and trim
         recommendations.sort(key=lambda x: x['priority'])
-        return recommendations[:max_recommendations]
+        return recommendations[:limit]
 
     def _get_connection_recommendations(self, connection: Dict[str, Any]) -> List[Dict[str, Any]]:
         recommendations = []

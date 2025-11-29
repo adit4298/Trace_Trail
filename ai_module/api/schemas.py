@@ -76,6 +76,9 @@ class RiskScoreResponse(BaseModel):
     category: str  # 'low', 'medium', 'high'
     breakdown: Dict[str, float]
     top_risk_factors: List[str]
+    anomaly_summary: Optional[Dict[str, Any]] = None
+    feature_vector: Optional[List[float]] = None
+    feature_snapshot: Optional[Dict[str, float]] = None
 
 class RecommendationResponse(BaseModel):
     """Individual recommendation."""
@@ -96,6 +99,8 @@ class TrendAnalysisResponse(BaseModel):
     predicted_score_7d: Optional[float]
     predicted_score_30d: Optional[float]
     data_points: int
+    velocity: Optional[float] = None
+    inflection_points: Optional[List[Dict[str, Any]]] = None
 
 class HealthCheckResponse(BaseModel):
     """Health check response."""

@@ -1,24 +1,36 @@
-import numpy as np
-from typing import Dict, Any, List, Tuple
-from sklearn.ensemble import IsolationForest
 import logging
+from pathlib import Path
+from typing import Dict, Any, List, Tuple
+
+import joblib
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
 logger = logging.getLogger(__name__)
 
 class AnomalyDetector:
-    """Detect anomalous privacy risk patterns. """
+    """Detect anomalous privacy risk patterns."""
 
-    def __init__(self, contamination: float = 0.1):
+    def __init__(self, contamination: float = 0.1, model_checkpoint: str | None = None):
         """
         Initialize anomaly detector.
 
         Args:
             contamination: Expected proportion of anomalies
         """
-        self.model = IsolationForest(
-            contamination=contamination,
-            random_state=42
-        )
-        self.is_trained = False
+        checkpoint_path = Path(model_checkpoint) if model_checkpoint else None
+        if checkpoint_path and checkpoint_path.exists():
+            self.model = joblib.load(checkpoint_path)
+            self.is_trained = True
+            logger.info("Loaded anomaly detector checkpoint from %s", checkpoint_path)
+        else:
+            self.model = IsolationForest(
+                contamination=contamination,
+                random_state=42
+            )
+            self.is_trained = False
+            if checkpoint_path:
+                logger.warning("Anomaly checkpoint %s not found; using fresh model", checkpoint_path)
         logger.info(f"AnomalyDetector initialized with contamination={contamination}")
 
     def train(self, X: np.ndarray):
