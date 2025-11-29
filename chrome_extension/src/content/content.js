@@ -1,34 +1,31 @@
-console.log('TraceTrail Content Script loaded on:', window.location.hostname);
+import { TrackerDetector } from './tracker-detector.js';
+import { PageAnalyzer } from './page-analyzer.js';
+import { MESSAGE_TYPES } from '../utils/constants.js';
 
-// Detect platform
+const trackerDetector = new TrackerDetector();
+const pageAnalyzer = new PageAnalyzer();
 const platform = detectPlatform();
-let isMonitoring = false;
 let trackerOverlay = null;
+let isMonitoring = false;
+let scrollTimeout;
 
-// Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Content script received:', request.type);
-
   switch (request.type) {
-    case 'MONITORING_STARTED':
+    case MESSAGE_TYPES.MONITORING_STARTED:
       startPageMonitoring(request.platform);
       sendResponse({ success: true });
       break;
-
-    case 'MONITORING_STOPPED':
+    case MESSAGE_TYPES.MONITORING_STOPPED:
       stopPageMonitoring();
       sendResponse({ success: true });
       break;
-
-    case 'TRACKERS_DETECTED':
+    case MESSAGE_TYPES.TRACKERS_DETECTED:
       showTrackerOverlay(request.trackers);
       sendResponse({ success: true });
       break;
-
     default:
       sendResponse({ error: 'Unknown message type' });
   }
-
   return true;
 });
 
@@ -41,79 +38,58 @@ function detectPlatform() {
   return 'unknown';
 }
 
-function startPageMonitoring(detectedPlatform) {
-  console.log(`Starting page monitoring for ${detectedPlatform}`);
+function startPageMonitoring(currentPlatform) {
   isMonitoring = true;
-
-  // Track page interactions
   document.addEventListener('click', handleClick);
-  document.addEventListener('scroll', handleScroll);
-
-  // Monitor DOM changes
+  document.addEventListener('scroll', handleScroll, { passive: true });
   observeDOMChanges();
-
-  // Analyze page content
-  analyzePage();
-
-  // Show monitoring indicator
+  analyzePage(currentPlatform);
   showMonitoringIndicator();
 }
 
 function stopPageMonitoring() {
-  console.log('Stopping page monitoring');
   isMonitoring = false;
-
   document.removeEventListener('click', handleClick);
   document.removeEventListener('scroll', handleScroll);
-
   removeMonitoringIndicator();
 }
 
 function handleClick(event) {
   if (!isMonitoring) return;
-
-  const target = event.target;
-  const activity = {
-    type: 'click',
-    element: target.tagName,
-    text: target.innerText?.substring(0, 50),
-    classes: Array.from(target.classList),
-    timestamp: Date.now()
-  };
-
-  // Send to background script
   chrome.runtime.sendMessage({
-    type: 'TRACK_ACTIVITY',
-    data: activity
+    type: MESSAGE_TYPES.TRACK_ACTIVITY,
+    data: {
+      type: 'click',
+      element: event.target.tagName,
+      text: event.target.innerText?.substring(0, 60),
+      classes: Array.from(event.target.classList),
+      timestamp: Date.now()
+    }
   });
 }
 
-let scrollTimeout;
 function handleScroll() {
   if (!isMonitoring) return;
-
   clearTimeout(scrollTimeout);
   scrollTimeout = setTimeout(() => {
-    const activity = {
-      type: 'scroll',
-      scrollY: window.scrollY,
-      scrollPercentage: (window.scrollY / document.body.scrollHeight) * 100,
-      timestamp: Date.now()
-    };
     chrome.runtime.sendMessage({
-      type: 'TRACK_ACTIVITY',
-      data: activity
+      type: MESSAGE_TYPES.TRACK_ACTIVITY,
+      data: {
+        type: 'scroll',
+        scrollY: Math.round(window.scrollY),
+        scrollPercentage: Math.round((window.scrollY / document.body.scrollHeight) * 100),
+        timestamp: Date.now()
+      }
     });
-  }, 500);
+  }, 350);
 }
 
 function observeDOMChanges() {
   const observer = new MutationObserver((mutations) => {
     if (!isMonitoring) return;
-
     mutations.forEach((mutation) => {
       if (mutation.addedNodes.length > 0) {
-        detectTrackersInNewContent(mutation.addedNodes);
+        detectTrackers(mutation.addedNodes);
       }
     });
   });
@@ -124,122 +100,89 @@ function observeDOMChanges() {
   });
 }
 
-function detectTrackersInNewContent(nodes) {
+function detectTrackers(nodes) {
   nodes.forEach((node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      // Check for tracking scripts
-      if (node.tagName === 'SCRIPT') {
-        const src = node.getAttribute('src');
-        if (src) {
-          chrome.runtime.sendMessage({ type: 'DETECT_TRACKERS', url: src });
-        }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    if (node.tagName === 'SCRIPT') {
+      const src = node.getAttribute('src');
+      if (src && trackerDetector.isTracker(src)) {
+        chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DETECT_TRACKERS, url: src });
       }
-
-      // Check for tracking pixels
-      if (node.tagName === 'IMG' && node.width === 1 && node.height === 1) {
-        chrome.runtime.sendMessage({ type: 'DETECT_TRACKERS', url: node.src });
+    }
+    if (node.tagName === 'IMG' && node.width <= 1 && node.height <= 1) {
+      chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DETECT_TRACKERS, url: node.src });
+    }
+    if (node.tagName === 'IFRAME') {
+      const src = node.getAttribute('src');
+      if (src && trackerDetector.isTracker(src)) {
+        chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DETECT_TRACKERS, url: src });
       }
     }
   });
 }
 
-function analyzePage() {
-  const analysis = {
-    platform,
-    url: window.location.href,
-    title: document.title,
-    scripts: Array.from(document.scripts).map(s => s.src).filter(Boolean),
-    iframes: Array.from(document.querySelectorAll('iframe')).map(i => i.src).filter(Boolean),
-    cookies: document.cookie.split(';').length,
-    localStorage: Object.keys(localStorage).length,
-    timestamp: Date.now()
-  };
-
-  console.log('Page analysis:', analysis);
-
+function analyzePage(currentPlatform) {
+  const analysis = pageAnalyzer.analyze();
   chrome.runtime.sendMessage({
-    type: 'TRACK_ACTIVITY',
-    data: { type: 'page_analysis', ...analysis }
+    type: MESSAGE_TYPES.TRACK_ACTIVITY,
+    data: { type: 'page_analysis', platform: currentPlatform, ...analysis }
   });
 }
 
 function showMonitoringIndicator() {
+  removeMonitoringIndicator();
   const indicator = document.createElement('div');
   indicator.id = 'tracetrail-indicator';
   indicator.innerHTML = `
+    <span></span>
     <div>
-      <span></span>
-      TraceTrail Monitoring
+      <strong>TraceTrail monitoring</strong>
+      <small>${platform} session</small>
     </div>
-    <style>
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
-    </style>
   `;
+  indicator.addEventListener('click', () => chrome.runtime.sendMessage({ type: MESSAGE_TYPES.SYNC_DATA }));
   document.body.appendChild(indicator);
-
-  indicator.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: 'OPEN_POPUP' });
-  });
 }
 
 function removeMonitoringIndicator() {
-  const indicator = document.getElementById('tracetrail-indicator');
-  if (indicator) indicator.remove();
+  document.getElementById('tracetrail-indicator')?.remove();
 }
 
 function showTrackerOverlay(trackers) {
   if (trackerOverlay) trackerOverlay.remove();
-
   trackerOverlay = document.createElement('div');
+  trackerOverlay.className = 'tracetrail-overlay';
   trackerOverlay.innerHTML = `
-    <div>
-      <div>
-        <div>
-          <span>⚠️</span>
-          <strong>Trackers Detected</strong>
-        </div>
-        <p>${trackers.length} tracking request(s) blocked</p>
-        <div>
-          ${trackers.map(t => `<div>${t.domain}</div>`).join('')}
-        </div>
-        <button id="close-tracker-overlay" style="
-          width: 100%;
-          padding: 8px;
-          background: #ef4444;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          font-weight: bold;
-          cursor: pointer;
-          font-size: 12px;
-        ">
-          Close
-        </button>
+    <div class="tracetrail-overlay__card">
+      <div class="tracetrail-overlay__badge">Trackers detected</div>
+      <p style="margin: 12px 0">${trackers.length} request(s) from known tracking domains were blocked.</p>
+      <div class="tracetrail-overlay__list">
+        ${trackers.map(
+          (tracker) => `
+            <div class="tracetrail-overlay__item">
+              <strong>${tracker.domain}</strong>
+              <span>${tracker.type ?? 'tracker'}</span>
+            </div>
+          `
+        ).join('')}
       </div>
+      <button class="tracetrail-overlay__CTA" id="dismiss-tracetrail-overlay">
+        Got it
+      </button>
     </div>
   `;
-
-  document.body.appendChild(trackerOverlay);
-
-  document.getElementById('close-tracker-overlay').addEventListener('click', () => {
-    trackerOverlay.remove();
+  trackerOverlay.querySelector('#dismiss-tracetrail-overlay')?.addEventListener('click', () => {
+    trackerOverlay?.remove();
     trackerOverlay = null;
   });
-
-  // Auto-close after 10 seconds
+  document.body.appendChild(trackerOverlay);
   setTimeout(() => {
-    if (trackerOverlay) {
-      trackerOverlay.remove();
-      trackerOverlay = null;
-    }
-  }, 10000);
+    trackerOverlay?.remove();
+    trackerOverlay = null;
+  }, 12_000);
 }
 
-// Initialize
 if (platform !== 'unknown') {
-  console.log(`Platform detected: ${platform}`);
-  chrome.runtime.sendMessage({ type: 'PLATFORM_DETECTED', platform });
+  chrome.runtime.sendMessage({ type: MESSAGE_TYPES.PLATFORM_DETECTED, platform });
 }
+

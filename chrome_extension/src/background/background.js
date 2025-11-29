@@ -1,12 +1,29 @@
-import { API_BASE_URL, SYNC_INTERVAL } from '../utils/constants.js';
+import {
+  SYNC_INTERVAL,
+  TRACKER_DOMAINS,
+  MESSAGE_TYPES,
+  DEFAULT_SETTINGS,
+  STORAGE_KEYS
+} from '../utils/constants.js';
 import { getStoredAuth, isAuthenticated } from '../utils/auth.js';
 import { sendToAPI } from '../utils/api.js';
+import { getSettings, observeSettings, storage } from '../utils/storage.js';
 
 // Service Worker initialization
 console.log('TraceTrail Background Service Worker loaded');
 
 // Track active monitoring sessions
 let monitoringSessions = new Map();
+let settings = { ...DEFAULT_SETTINGS };
+
+async function bootstrapSettings() {
+  settings = await getSettings();
+}
+
+bootstrapSettings();
+observeSettings((nextSettings) => {
+  settings = nextSettings;
+});
 
 // Install event
 chrome.runtime.onInstalled.addListener((details) => {
@@ -33,27 +50,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('Background received message:', request.type);
 
   switch (request.type) {
-    case 'START_MONITORING':
+    case MESSAGE_TYPES.START_MONITORING:
       startMonitoring(request.platform, sender.tab);
       sendResponse({ success: true });
       break;
 
-    case 'STOP_MONITORING':
+    case MESSAGE_TYPES.PLATFORM_DETECTED:
+      startMonitoring(request.platform, sender.tab);
+      sendResponse({ success: true });
+      break;
+
+    case MESSAGE_TYPES.STOP_MONITORING:
       stopMonitoring(request.platform);
       sendResponse({ success: true });
       break;
 
-    case 'TRACK_ACTIVITY':
+    case MESSAGE_TYPES.TRACK_ACTIVITY:
       handleActivityTracking(request.data, sender.tab);
       sendResponse({ success: true });
       break;
 
-    case 'DETECT_TRACKERS':
+    case MESSAGE_TYPES.DETECT_TRACKERS:
       detectTrackers(request.url, sender.tab);
       sendResponse({ success: true });
       break;
 
-    case 'SYNC_DATA':
+    case MESSAGE_TYPES.SYNC_DATA:
       syncDataToBackend();
       sendResponse({ success: true });
       break;
@@ -87,6 +109,9 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 // Functions
 async function startMonitoring(platform, tab) {
+  if (!settings.autoMonitor) return;
+  if (!tab?.id) return;
+  if (monitoringSessions.has(tab.id)) return;
   console.log(`Starting monitoring for ${platform} on tab ${tab.id}`);
   monitoringSessions.set(tab.id, {
     platform,
@@ -96,12 +121,12 @@ async function startMonitoring(platform, tab) {
 
   // Send message to content script
   chrome.tabs.sendMessage(tab.id, {
-    type: 'MONITORING_STARTED',
+    type: MESSAGE_TYPES.MONITORING_STARTED,
     platform
   });
 
   // Update badge
-  chrome.action.setBadgeText({ text: '️', tabId: tab.id });
+  chrome.action.setBadgeText({ text: '●', tabId: tab.id });
   chrome.action.setBadgeBackgroundColor({ color: '#22c55e', tabId: tab.id });
 }
 
@@ -134,16 +159,7 @@ async function handleActivityTracking(data, tab) {
 
 async function detectTrackers(url, tab) {
   const trackers = [];
-  const trackerDomains = [
-    'doubleclick.net',
-    'google-analytics.com',
-    'facebook.com/tr',
-    'connect.facebook.net',
-    'analytics.twitter.com',
-    'ads-twitter.com'
-  ];
-
-  trackerDomains.forEach((domain) => {
+  TRACKER_DOMAINS.forEach((domain) => {
     if (url.includes(domain)) {
       trackers.push({
         domain,
@@ -156,10 +172,18 @@ async function detectTrackers(url, tab) {
 
   if (trackers.length > 0) {
     console.log('Trackers detected:', trackers);
+    storage.set(
+      STORAGE_KEYS.TRACKER_CACHE,
+      {
+        trackers,
+        timestamp: Date.now()
+      },
+      'local'
+    );
 
     // Send to content script to display
     chrome.tabs.sendMessage(tab.id, {
-      type: 'TRACKERS_DETECTED',
+      type: MESSAGE_TYPES.TRACKERS_DETECTED,
       trackers
     });
 
@@ -176,8 +200,8 @@ async function detectTrackers(url, tab) {
 }
 
 function shouldBlockRequest(details) {
-  const blockList = ['doubleclick.net', 'googleadservices.com'];
-  return blockList.some((domain) => details.url.includes(domain));
+  if (!settings.blockTrackers) return false;
+  return TRACKER_DOMAINS.some((domain) => details.url.includes(domain));
 }
 
 async function syncDataToBackend() {

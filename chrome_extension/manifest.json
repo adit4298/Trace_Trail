@@ -9,6 +9,7 @@
     "tabs",
     "cookies",
     "webRequest",
+    "webRequestBlocking",
     "webNavigation",
     "alarms",
     "notifications"
@@ -33,8 +34,12 @@
         "*://*.twitter.com/*",
         "*://*.linkedin.com/*"
       ],
-      "js": ["content.js"],
-      "css": ["content.css"],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -53,8 +58,13 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["icons/*", "assets/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "icons/*",
+        "assets/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "content_security_policy": {
