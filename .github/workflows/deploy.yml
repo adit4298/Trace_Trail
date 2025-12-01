@@ -5,58 +5,81 @@ on:
     types: [published]
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+  AWS_REGION: us-east-1
+  ECR_BACKEND_REPO: tracetrail-backend
+  ECR_FRONTEND_REPO: tracetrail-frontend
 
 jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment: production
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push images
+      - name: Build and push container images
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          docker build -f deployment/docker/backend.Dockerfile -t $ECR_REGISTRY/tracetrail-backend:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/tracetrail-backend:$IMAGE_TAG
-          docker build -f deployment/docker/frontend.Dockerfile -t $ECR_REGISTRY/tracetrail-frontend:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/tracetrail-frontend:$IMAGE_TAG
+          set -euo pipefail
+          docker build -f deployment/Docker/Dockerfile.backend -t $ECR_REGISTRY/${{ env.ECR_BACKEND_REPO }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_BACKEND_REPO }}:$IMAGE_TAG
+          docker build -f deployment/Docker/Dockerfile.frontend -t $ECR_REGISTRY/${{ env.ECR_FRONTEND_REPO }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_FRONTEND_REPO }}:$IMAGE_TAG
 
-      - name: Update Kubernetes manifests
+      - name: Configure kubeconfig
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         run: |
-          sed -i "s|image: tracetrail/backend:latest|image: $ECR_REGISTRY/tracetrail-backend:$IMAGE_TAG|g" deployment/k8s/*.yaml
-          sed -i "s|image: tracetrail/frontend:latest|image: $ECR_REGISTRY/tracetrail-frontend:$IMAGE_TAG|g" deployment/k8s/*.yaml
+          set -euo pipefail
+          mkdir -p ~/.kube
+          if [ -n "${KUBE_CONFIG:-}" ]; then
+            if echo "$KUBE_CONFIG" | base64 --decode >/tmp/kubeconfig 2>/dev/null; then
+              mv /tmp/kubeconfig ~/.kube/config
+            else
+              echo "$KUBE_CONFIG" > ~/.kube/config
+            fi
+          else
+            aws eks update-kubeconfig --name tracetrail-production --region ${{ env.AWS_REGION }}
+          fi
 
-      - name: Deploy to EKS
+      - name: Apply Kubernetes manifests and rollout
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          aws eks update-kubeconfig --name tracetrail-production --region us-east-1
-          kubectl apply -f deployment/k8s/
-          kubectl rollout status deployment/backend -n tracetrail
-          kubectl rollout status deployment/frontend -n tracetrail
+          set -euo pipefail
+          kubectl apply -f deployment/k8s/namespace.yaml
+          kubectl apply -f deployment/k8s/backend.yaml
+          kubectl apply -f deployment/k8s/frontend.yaml
+          kubectl apply -f deployment/k8s/ingress.yaml
+          kubectl -n tracetrail set image deployment/backend backend=$ECR_REGISTRY/${{ env.ECR_BACKEND_REPO }}:$IMAGE_TAG
+          kubectl -n tracetrail set image deployment/frontend frontend=$ECR_REGISTRY/${{ env.ECR_FRONTEND_REPO }}:$IMAGE_TAG
+          kubectl rollout status deployment/backend -n tracetrail --timeout=180s
+          kubectl rollout status deployment/frontend -n tracetrail --timeout=180s
 
       - name: Notify Slack
         if: always()
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v1.25.0
         with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,job
-          text: 'Deployment to production completed!'
+          payload: |
+            {
+              "text": ":rocket: Deploy ${{ github.event.release.tag_name }} finished with status *${{ job.status }}*"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

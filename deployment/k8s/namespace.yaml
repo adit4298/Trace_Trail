@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tracetrail
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracetrail-backend-config
+  namespace: tracetrail
+data:
+  APP_NAME: "TraceTrail API"
+  ENVIRONMENT: "production"
+  CORS_ORIGINS: "https://tracetrail.in,https://www.tracetrail.in"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracetrail-frontend-config
+  namespace: tracetrail
+data:
+  NEXT_PUBLIC_API_URL: "https://api.tracetrail.in"
+
