@@ -1,1 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tracetrail
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracetrail-backend-config
+  namespace: tracetrail
+data:
+  APP_NAME: "TraceTrail API"
+  ENVIRONMENT: "production"
+  CORS_ORIGINS: "https://tracetrail.in,https://www.tracetrail.in"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracetrail-frontend-config
+  namespace: tracetrail
+data:
+  NEXT_PUBLIC_API_URL: "https://api.tracetrail.in"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tracetrail-backend-secrets
+  namespace: tracetrail
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql+psycopg://tracetrail:CHANGE_ME@postgres:5432/trace_trail"
+  SECRET_KEY: "CHANGE_ME"
+  DB_USER: "tracetrail"
+  DB_PASSWORD: "CHANGE_ME"
+  DB_HOST: "postgres.tracetrail.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "trace_trail"
+  REDIS_URL: "redis://redis:6379/0"
 
