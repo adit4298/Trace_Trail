@@ -1,0 +1,22 @@
+{
+  "name": "TraceTrail - Privacy Dashboard",
+  "short_name": "TraceTrail",
+  "description": "Your privacy companion. Track, analyze, and improve your digital privacy.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0ea5e9",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

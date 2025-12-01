@@ -1,0 +1,87 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Black Background -->
+  <rect width="800" height="800" fill="#000000"/>
+  
+  <!-- HANDPRINT LOGO -->
+  <g transform="translate(400, 250)">
+    
+    <!-- THUMB (Left side) -->
+    <g transform="translate(-110, -20)">
+      <!-- Dashed line segments for thumb -->
+      <path d="M 0 60 L 0 -40" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+      <path d="M -20 50 L -30 -30" stroke="url(#greenGradient)" stroke-width="20" fill="none" stroke-linecap="round" stroke-dasharray="28 18"/>
+      <path d="M 20 55 L 25 -35" stroke="url(#greenGradient)" stroke-width="20" fill="none" stroke-linecap="round" stroke-dasharray="28 18"/>
+    </g>
+    
+    <!-- INDEX FINGER (Left-middle) -->
+    <g transform="translate(-50, -80)">
+      <path d="M 0 120 L 0 -50" stroke="url(#greenGradient)" stroke-width="24" fill="none" stroke-linecap="round" stroke-dasharray="32 22"/>
+      <path d="M -22 110 L -25 -40" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+      <path d="M 22 115 L 28 -45" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+    </g>
+    
+    <!-- MIDDLE FINGER (Center) -->
+    <g transform="translate(0, -100)">
+      <path d="M 0 140 L 0 -60" stroke="url(#greenGradient)" stroke-width="26" fill="none" stroke-linecap="round" stroke-dasharray="34 24"/>
+      <path d="M -24 130 L -28 -55" stroke="url(#greenGradient)" stroke-width="24" fill="none" stroke-linecap="round" stroke-dasharray="32 22"/>
+      <path d="M 24 135 L 30 -58" stroke="url(#greenGradient)" stroke-width="24" fill="none" stroke-linecap="round" stroke-dasharray="32 22"/>
+    </g>
+    
+    <!-- RING FINGER (Right-middle) -->
+    <g transform="translate(50, -80)">
+      <path d="M 0 120 L 0 -50" stroke="url(#greenGradient)" stroke-width="24" fill="none" stroke-linecap="round" stroke-dasharray="32 22"/>
+      <path d="M -22 110 L -25 -40" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+      <path d="M 22 115 L 28 -45" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+    </g>
+    
+    <!-- PINKY FINGER (Right side) -->
+    <g transform="translate(110, -20)">
+      <path d="M 0 60 L 0 -40" stroke="url(#greenGradient)" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="30 20"/>
+      <path d="M -20 50 L -30 -30" stroke="url(#greenGradient)" stroke-width="20" fill="none" stroke-linecap="round" stroke-dasharray="28 18"/>
+      <path d="M 20 55 L 25 -35" stroke="url(#greenGradient)" stroke-width="20" fill="none" stroke-linecap="round" stroke-dasharray="28 18"/>
+    </g>
+    
+    <!-- PALM - Concentric dashed circles -->
+    <!-- Innermost circle -->
+    <circle cx="0" cy="60" r="35" stroke="url(#greenGradient)" stroke-width="18" fill="none" 
+            stroke-dasharray="22 18" stroke-linecap="round"/>
+    
+    <!-- Second circle -->
+    <circle cx="0" cy="60" r="70" stroke="url(#greenGradient)" stroke-width="20" fill="none" 
+            stroke-dasharray="28 20" stroke-linecap="round"/>
+    
+    <!-- Third circle -->
+    <circle cx="0" cy="60" r="105" stroke="url(#greenGradient)" stroke-width="22" fill="none" 
+            stroke-dasharray="34 24" stroke-linecap="round"/>
+    
+    <!-- Outer circle -->
+    <circle cx="0" cy="60" r="135" stroke="url(#greenGradient)" stroke-width="20" fill="none" 
+            stroke-dasharray="40 28" stroke-linecap="round"/>
+    
+  </g>
+  
+  <!-- Text: TRACETRAIL -->
+  <text x="400" y="560" 
+        font-family="'Arial Black', 'Arial Bold', sans-serif" 
+        font-size="85" 
+        font-weight="900" 
+        fill="#FFFFFF" 
+        text-anchor="middle"
+        letter-spacing="8">TRACETRAIL</text>
+  
+  <!-- Text: LEVEL UP YOUR PRIVACY -->
+  <text x="400" y="630" 
+        font-family="'Arial', sans-serif" 
+        font-size="38" 
+        font-weight="700" 
+        fill="#22c55e" 
+        text-anchor="middle"
+        letter-spacing="12">LEVEL UP YOUR PRIVACY</text>
+</svg>

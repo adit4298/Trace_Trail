@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TraceTrail Extension</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <div class="popup">
+    <header>
+      <div class="brand">
+        <img src="icons/icon48.png" alt="TraceTrail logo" />
+        <div>
+          <h1>TraceTrail</h1>
+          <span>Chrome telemetry companion</span>
+        </div>
+      </div>
+      <button id="sync-now" class="ghost-btn">Sync now</button>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Risk summary</h2>
+        <div class="risk-score">
+          <div>
+            <div class="risk-score__value" data-risk-score>--</div>
+            <div class="risk-score__trend" data-risk-trend></div>
+          </div>
+          <span class="risk-score__badge" data-risk-category>Not available</span>
+        </div>
+        <div class="risk-metrics">
+          <div class="metric">
+            <span>Social exposure</span>
+            <strong data-social-risk>--</strong>
+          </div>
+          <div class="metric">
+            <span>Data footprint</span>
+            <strong data-data-risk>--</strong>
+          </div>
+          <div class="metric">
+            <span>Privacy settings</span>
+            <strong data-privacy-risk>--</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Live trackers</h2>
+        <div class="tracker-list" id="tracker-list">
+          <p class="empty-state">No trackers flagged in this browsing session.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Linked accounts</h2>
+        <div class="connections" id="connection-list">
+          <p class="empty-state">Connect a platform in the settings panel to begin collecting telemetry.</p>
+        </div>
+      </section>
+
+      <section class="card settings-panel" id="settings-panel">
+        <h2>Extension settings</h2>
+        <form id="settings-form" autocomplete="off">
+          <div class="settings-group">
+            <label for="api-base">API base URL</label>
+            <input type="url" id="api-base" name="apiBaseUrl" placeholder="https://api.tracetrail.com" />
+          </div>
+
+          <div class="settings-group">
+            <label for="token-input">Access token</label>
+            <input type="password" id="token-input" name="accessToken"
+              placeholder="Paste token from TraceTrail dashboard" />
+          </div>
+
+          <div class="settings-group">
+            <label for="extension-id">Extension user ID</label>
+            <input type="number" id="extension-id" name="extensionUserId" placeholder="1234" min="1" />
+          </div>
+
+          <div class="switch">
+            <span>Auto monitoring</span>
+            <input type="checkbox" id="auto-monitor" name="autoMonitor" />
+          </div>
+
+          <div class="switch">
+            <span>Block known trackers</span>
+            <input type="checkbox" id="block-trackers" name="blockTrackers" />
+          </div>
+
+          <div class="switch">
+            <span>Share telemetry</span>
+            <input type="checkbox" id="telemetry-opt" name="telemetry" />
+          </div>
+
+          <button class="btn btn--primary" type="submit">Save settings</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <button id="toggle-settings" class="btn btn--secondary">Settings</button>
+      <button id="open-dashboard" class="btn btn--primary">Open dashboard</button>
+    </footer>
+  </div>
+
+  <div id="status-banner" class="status-banner"></div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
+
