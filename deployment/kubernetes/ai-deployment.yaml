@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: ai-module
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/tracetrail-ai:latest
+          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-ai:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: BACKEND_URL
