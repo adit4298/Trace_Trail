@@ -1,0 +1,102 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ALB Request & Error Rate",
+        "region": "us-east-1",
+        "stat": "Sum",
+        "period": 300,
+        "view": "timeSeries",
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "RequestCount",
+            "LoadBalancer",
+            "app/tracetrail/REPLACE_WITH_ALB_SUFFIX"
+          ],
+          [
+            "AWS/ApplicationELB",
+            "HTTPCode_ELB_5XX_Count",
+            "LoadBalancer",
+            "app/tracetrail/REPLACE_WITH_ALB_SUFFIX",
+            { "yAxis": "right" }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "LoadBalancer",
+            "app/tracetrail/REPLACE_WITH_ALB_SUFFIX",
+            { "yAxis": "right" }
+          ]
+        ],
+        "yAxis": {
+          "left": { "label": "Requests" },
+          "right": { "label": "Errors / Response (ms)" }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "EKS Cluster CPU & Memory",
+        "region": "us-east-1",
+        "stat": "Average",
+        "period": 300,
+        "view": "timeSeries",
+        "metrics": [
+          [
+            "ContainerInsights",
+            "node_cpu_utilization",
+            "ClusterName",
+            "tracetrail-production"
+          ],
+          [
+            "ContainerInsights",
+            "node_memory_utilization",
+            "ClusterName",
+            "tracetrail-production",
+            { "label": "Memory (%)" }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Backend Pod Health",
+        "region": "us-east-1",
+        "stat": "Sum",
+        "period": 300,
+        "view": "timeSeries",
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{Namespace=\"ContainerInsights\",ClusterName=\"tracetrail-production\",PodName=\"backend.*\",MetricName=\"pod_number_of_container_restarts\"}', 'Sum', 300)",
+              "label": "Backend pod restarts"
+            }
+          ],
+          [
+            {
+              "expression": "SEARCH('{Namespace=\"ContainerInsights\",ClusterName=\"tracetrail-production\",PodName=\"backend.*\",MetricName=\"pod_cpu_utilization\"}', 'Average', 300)",
+              "label": "CPU (%)"
+            }
+          ],
+          [
+            {
+              "expression": "SEARCH('{Namespace=\"ContainerInsights\",ClusterName=\"tracetrail-production\",PodName=\"backend.*\",MetricName=\"pod_memory_utilization\"}', 'Average', 300)",
+              "label": "Memory (%)"
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}
+

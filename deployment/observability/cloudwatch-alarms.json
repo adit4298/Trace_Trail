@@ -1,0 +1,49 @@
+[
+  {
+    "AlarmName": "TraceTrail-ALB-5XX",
+    "AlarmDescription": "Backend/API returning elevated 5xx responses via ALB.",
+    "MetricName": "HTTPCode_ELB_5XX_Count",
+    "Namespace": "AWS/ApplicationELB",
+    "Statistic": "Sum",
+    "Period": 300,
+    "EvaluationPeriods": 1,
+    "Threshold": 10,
+    "ComparisonOperator": "GreaterThanThreshold",
+    "TreatMissingData": "notBreaching",
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:123456789012:tracetrail-alerts"
+    ],
+    "Dimensions": [
+      {
+        "Name": "LoadBalancer",
+        "Value": "app/tracetrail/REPLACE_WITH_ALB_SUFFIX"
+      }
+    ]
+  },
+  {
+    "AlarmName": "TraceTrail-Backend-Restarts",
+    "AlarmDescription": "Container restarts detected for backend pods in EKS.",
+    "MetricName": "pod_number_of_container_restarts",
+    "Namespace": "ContainerInsights",
+    "Statistic": "Sum",
+    "Period": 300,
+    "EvaluationPeriods": 1,
+    "Threshold": 1,
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "TreatMissingData": "notBreaching",
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:123456789012:tracetrail-alerts"
+    ],
+    "Dimensions": [
+      {
+        "Name": "ClusterName",
+        "Value": "tracetrail-production"
+      },
+      {
+        "Name": "PodName",
+        "Value": "backend-*"
+      }
+    ]
+  }
+]
+

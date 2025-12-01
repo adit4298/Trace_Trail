@@ -21,22 +21,22 @@ Both Dockerfiles are multi-stage builds used locally, in CI, and in production. 
 |---------------------------|----------------------------------------------------------------------------------------|
 | `namespace.yaml`          | Creates the `tracetrail` namespace + ConfigMaps for backend/frontend runtime config.   |
 | `backend.yaml`            | Backend `Deployment` (replicas=2) and ClusterIP `Service` on port 8000.                |
-| `frontend.yaml`           | Frontend `Deployment` (replicas=2) and ClusterIP `Service` on port 80.                 |
+| `frontend.yaml`           | Frontend `Deployment` (replicas=2) and ClusterIP `Service` on port 80 → pods listen on 3000 (Next.js SSR). |
 | `ingress.yaml`            | AWS ALB Ingress (internet-facing) routing `tracetrail.in`/`www` to the frontend and `api.tracetrail.in` to the backend. |
 
-Secrets (database credentials, API keys, etc.) are **not** stored in Git. Before deploying, create them once:
+Secrets (database credentials, API keys, etc.) are **not** stored in Git. Use the template to generate them safely:
 
 ```bash
-kubectl create namespace tracetrail
-kubectl create secret generic tracetrail-backend-secrets \
-  -n tracetrail \
-  --from-literal=DATABASE_URL="postgresql+psycopg://USER:PASSWORD@postgres:5432/trace_trail" \
-  --from-literal=SECRET_KEY="generate-a-64-char-string" \
-  --from-literal=DB_USER="trace_trail" \
-  --from-literal=DB_PASSWORD="..." \
-  --from-literal=DB_HOST="postgres.tracetrail.svc.cluster.local" \
-  --from-literal=DB_PORT="5432" \
-  --from-literal=DB_NAME="trace_trail"
+export DATABASE_URL="postgresql+psycopg://USER:PASSWORD@postgres:5432/trace_trail"
+export SECRET_KEY="generate-a-64-char-string"
+export DB_USER="trace_trail"
+export DB_PASSWORD="..."
+export DB_HOST="postgres.tracetrail.svc.cluster.local"
+export DB_PORT="5432"
+export DB_NAME="trace_trail"
+export REDIS_URL="redis://redis:6379/0"
+
+envsubst < deployment/k8s/secrets.template.yaml | kubectl apply -f -
 ```
 
 You only need to run the command again when rotating credentials.
@@ -154,6 +154,21 @@ Validate it (DNS validation is easiest if using Route 53). After validation, cop
 - **Pods crashlooping**: check `kubectl logs deployment/backend -n tracetrail` and ensure the secret `tracetrail-backend-secrets` exists.
 - **Ingress pending**: verify the AWS Load Balancer Controller is installed in the cluster and the subnets are tagged with `kubernetes.io/role/elb=1`.
 - **DNS not resolving**: verify GoDaddy records point to the ALB hostname and wait for propagation; use `nslookup tracetrail.in`.
+
+---
+
+## 10. Health dashboards & alerts
+
+- **Dashboard**: apply `deployment/observability/cloudwatch-dashboard.json` via `aws cloudwatch put-dashboard`. It visualises ALB request/error rate, EKS node utilisation, and backend pod health. Remember to replace `REPLACE_WITH_ALB_SUFFIX`.
+- **Alerts**: create an SNS topic (e.g., `tracetrail-alerts`), update the ARNs/placeholders inside `deployment/observability/cloudwatch-alarms.json`, then run:
+
+  ```bash
+  jq -c '.[]' deployment/observability/cloudwatch-alarms.json | while read alarm; do
+    aws cloudwatch put-metric-alarm --cli-input-json "$alarm"
+  done
+  ```
+
+Connect the SNS topic to Slack via AWS Chatbot or to email/SMS for immediate notifications when ALB 5xx spikes or pods restart.
 
 That’s it—ship a release tag and the pipeline handles the rest. Happy deployments!
 
