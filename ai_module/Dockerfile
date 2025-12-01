@@ -23,4 +23,5 @@ COPY . .
 EXPOSE 8100
 
 # ⚠️ Make sure you actually have app/main.py with `app = FastAPI()` inside it.
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8100"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8100"]
+
