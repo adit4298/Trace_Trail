@@ -20,7 +20,7 @@ spec:
       containers:
         - name: ai-module
           image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-ai:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: BACKEND_URL
               value: http://backend.tracetrail.svc.cluster.local:8000
