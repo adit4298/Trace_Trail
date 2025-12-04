@@ -11,8 +11,6 @@ data:
   AI_MODULE_URL: "http://ai-module.tracetrail.svc.cluster.local:8100"
 
 ---
-# --- Backend Secrets: DB / Redis / app secrets (POSTGRES-STYLE)
----
 # --- Backend Secrets: DB / app secrets (RDS PostgreSQL)
 apiVersion: v1
 kind: Secret
@@ -22,8 +20,8 @@ metadata:
 type: Opaque
 stringData:
   # Full Postgres DSN pointing at your RDS instance
-  DATABASE_URL: "postgresql://tracetrail:May#!Mon05@tracetrail-db.c9os064iejax.ap-southeast-2.rds.amazonaws.com:5432/trace_trail
-"
+  # NOTE: password May#!Mon05 is URL-encoded as May%23%21Mon05
+  DATABASE_URL: "postgresql://tracetrail:May%23%21Mon05@tracetrail-db.c9os064iejax.ap-southeast-2.rds.amazonaws.com:5432/trace_trail"
 
   SECRET_KEY: "8jIBTuwJX3NNqJDbNfBQavIAv-XnjLs4rNaRPeemEh0"
 
@@ -36,7 +34,6 @@ stringData:
 
   # Leave empty unless you actually set up Redis
   REDIS_URL: ""
-
 
 ---
 apiVersion: apps/v1
@@ -108,9 +105,9 @@ spec:
                   key: DB_NAME
             - name: REDIS_URL
               valueFrom:
-                  secretKeyRef:
-                    name: tracetrail-backend-secrets
-                    key: REDIS_URL
+                secretKeyRef:
+                  name: tracetrail-backend-secrets
+                  key: REDIS_URL
           readinessProbe:
             httpGet:
               path: /health
