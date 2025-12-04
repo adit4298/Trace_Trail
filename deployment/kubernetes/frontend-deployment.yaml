@@ -20,11 +20,10 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/tracetrail-frontend:latest
-          imagePullPolicy: IfNotPresent
-          envFrom:
-            - configMapRef:
-                name: tracetrail-frontend-config
+          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-frontend:latest
+          imagePullPolicy: Always
+          # If you REALLY want envs from a ConfigMap, we can add it later.
+          # For now, NEXT_PUBLIC_API_URL is baked into the build via .env.production.
           ports:
             - name: http
               containerPort: 3000
@@ -47,6 +46,7 @@ spec:
             limits:
               cpu: 300m
               memory: 512Mi
+
 ---
 apiVersion: v1
 kind: Service
@@ -60,7 +60,6 @@ spec:
     app: frontend
   ports:
     - name: http
-      port: 80
-      targetPort: 3000
-  type: ClusterIP
-
+      port: 80         # external port (LB)
+      targetPort: 3000 # Next.js container port
+  type: LoadBalancer
