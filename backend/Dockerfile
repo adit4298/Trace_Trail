@@ -12,15 +12,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
-COPY requirements.txt .
+# Copy dependency files and install Python deps
+COPY requirements ./requirements
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements/base.txt && \
+    pip install --no-cache-dir -r requirements/dev.txt
 
-# Email validator (required by Pydantic EmailStr)
-RUN pip install email-validator
-
-# Copy backend source code (NOT ai_module)
+# Copy backend source code
 COPY . .
 
 ENV PYTHONPATH=/app/
