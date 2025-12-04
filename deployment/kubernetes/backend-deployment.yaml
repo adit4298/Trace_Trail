@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: tracetrail-backend-secrets
                   key: DATABASE_URL
+            - name: TRACE_TRAIL_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: tracetrail-backend-secrets
+                  key: DATABASE_URL
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -107,6 +112,7 @@ spec:
                 secretKeyRef:
                   name: tracetrail-backend-secrets
                   key: REDIS_URL
+
           readinessProbe:
             httpGet:
               path: /health
