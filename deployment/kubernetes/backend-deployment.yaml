@@ -46,7 +46,6 @@ metadata:
     app.kubernetes.io/component: api
     app.kubernetes.io/part-of: tracetrail
 spec:
-  # start with 1 replica so it schedules easily; you can scale later
   replicas: 1
   selector:
     matchLabels:
