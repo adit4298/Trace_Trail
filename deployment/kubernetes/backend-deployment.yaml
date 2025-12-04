@@ -146,8 +146,8 @@ metadata:
 spec:
   selector:
     app: backend
+  type: LoadBalancer
   ports:
     - name: http
-      port: 8000
-      targetPort: 8000
-  type: ClusterIP
+      port: 80          # external port
+      targetPort: 8000  # backend container port
