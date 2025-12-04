@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/tracetrail-backend:latest
-          imagePullPolicy: IfNotPresent
+          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-backend:latest
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8000
