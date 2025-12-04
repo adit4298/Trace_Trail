@@ -18,7 +18,8 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy app code
-COPY . .
+COPY . ./ai_module
+ENV PYTHONPATH=/app/
 
 # The app listens on 8100, so expose 8100 (not mandatory but nice)
 EXPOSE 8100
