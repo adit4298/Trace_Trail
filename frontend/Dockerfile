@@ -2,14 +2,13 @@
 
 # --- Install dependencies ---
 FROM node:20-alpine AS deps
-# optional but often needed for some npm packages
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# copy lockfile + package json for reproducible installs
+# Copy lockfile + package for reproducible installs
 COPY package.json package-lock.json ./
 
-# install all deps (dev + prod) for build stage
+# Install all deps (dev + prod) for build
 RUN npm ci
 
 # --- Build stage ---
@@ -17,12 +16,12 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# reuse node_modules from deps
+# Reuse node_modules from deps
 COPY --from=deps /app/node_modules ./node_modules
-# copy the rest of the app
+# Copy the rest of the app (including .env.production)
 COPY . .
 
-# if you have .env.production, Next will use it here
+# Build Next.js app
 RUN npm run build
 
 # --- Runtime stage ---
@@ -33,12 +32,12 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000
 
-# only copy what we need to run the built app
+# Only what we need to run the app
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY package.json package-lock.json ./
 
-# install only production deps
+# Install only production dependencies
 RUN npm ci --omit=dev
 
 EXPOSE 3000
