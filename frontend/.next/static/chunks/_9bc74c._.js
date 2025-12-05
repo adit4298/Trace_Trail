@@ -23,7 +23,7 @@ const applyDocumentTheme = (value)=>{
 };
 const ThemeProvider = ({ children })=>{
     _s();
-    const [theme, setThemeState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('light');
+    const [theme, setThemeState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('dark');
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -62,7 +62,7 @@ const ThemeProvider = ({ children })=>{
         columnNumber: 10
     }, this);
 };
-_s(ThemeProvider, "01J/TvGko0fcUy2hBK/M4PoK8Lk=");
+_s(ThemeProvider, "y6DIoVIDzvz4ZGJta42NEWzj7Gg=");
 _c = ThemeProvider;
 const useTheme = ()=>{
     _s1();
