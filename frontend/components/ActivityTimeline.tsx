@@ -11,8 +11,9 @@ interface ActivityTimelineProps {
 
 const stateColorMap: Record<Activity['state'], string> = {
   success: 'bg-success/20 text-success border-success/40',
+  info: 'bg-primary/10 text-primary border-primary/30',
   warning: 'bg-warning/20 text-warning border-warning/40',
-  danger: 'bg-danger/20 text-danger border-danger/40'
+  critical: 'bg-danger/20 text-danger border-danger/40'
 };
 
 export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {

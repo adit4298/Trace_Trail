@@ -3,32 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --color-background: 247 248 252;
-  --color-surface: 255 255 255;
-  --color-muted: 100 116 139;
-  --color-foreground: 15 23 42;
-  --color-primary: 99 102 241;
-  --color-primary-foreground: 255 255 255;
-  --color-border: 227 229 235;
-  --color-success: 34 197 94;
-  --color-warning: 245 158 11;
-  --color-danger: 239 68 68;
-  --shadow-soft: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
-}
-
-[data-theme='dark'] {
-  --color-background: 15 23 42;
-  --color-surface: 30 41 59;
+  --font-sans: 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --color-background: 6 11 25;
+  --color-surface: 9 15 32;
   --color-muted: 148 163 184;
   --color-foreground: 226 232 240;
-  --color-primary: 94 234 212;
-  --color-primary-foreground: 15 23 42;
-  --color-border: 51 65 85;
-  --color-success: 34 197 94;
-  --color-warning: 249 115 22;
+  --color-primary: 45 212 191;
+  --color-primary-foreground: 3 7 18;
+  --color-border: 34 45 68;
+  --color-success: 16 185 129;
+  --color-warning: 245 158 11;
   --color-danger: 248 113 113;
-  --shadow-soft: 0 20px 45px -24px rgba(15, 23, 42, 0.65);
+  --shadow-soft: 0 30px 80px rgba(2, 6, 23, 0.65);
+}
+
+[data-theme='light'] {
+  --color-background: 245 247 255;
+  --color-surface: 255 255 255;
+  --color-muted: 71 85 105;
+  --color-foreground: 15 23 42;
+  --color-primary: 79 70 229;
+  --color-primary-foreground: 255 255 255;
+  --color-border: 219 234 254;
+  --color-success: 16 185 129;
+  --color-warning: 245 158 11;
+  --color-danger: 239 68 68;
+  --shadow-soft: 0 25px 50px rgba(15, 23, 42, 0.3);
 }
 
 @layer base {
@@ -38,6 +38,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    background-image: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(129, 140, 248, 0.15), transparent 50%);
+    background-color: #030712;
   }
 
   ::selection {
@@ -48,6 +51,10 @@
 @layer components {
   .focus-ring {
     @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-white/5 bg-white/5 shadow-[0_30px_80px_rgba(3,7,18,0.65)] backdrop-blur-3xl;
   }
 
   .skip-link {

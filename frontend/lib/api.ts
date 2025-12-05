@@ -77,10 +77,10 @@ async function toErrorMessage(response: Response) {
 
 const mockDashboardSnapshot: DashboardSnapshot = {
   navigation: [
-    { id: 'overview', label: 'Overview', href: '/', icon: 'dashboard' },
-    { id: 'insights', label: 'Insights', href: '/insights', icon: 'insights', badge: 'Live' },
+    { id: 'overview', label: 'Overview', href: '/', icon: 'overview' },
+    { id: 'signals', label: 'Signals', href: '/signals', icon: 'signals', badge: 'Live' },
+    { id: 'investigations', label: 'Investigations', href: '/investigations', icon: 'investigations' },
     { id: 'activity', label: 'Activity', href: '/activity', icon: 'activity' },
-    { id: 'connections', label: 'Connections', href: '/connections', icon: 'connections' },
     { id: 'reports', label: 'Reports', href: '/reports', icon: 'reports' },
     { id: 'security', label: 'Security', href: '/security', icon: 'security' },
     { id: 'settings', label: 'Settings', href: '/settings', icon: 'settings' }
@@ -101,7 +101,8 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       trend: 'down',
       target: 30,
       progress: 0.67,
-      annotation: 'Lower is better'
+      annotation: 'Lower is better',
+      status: 'Stable'
     },
     {
       id: 'signals',
@@ -110,7 +111,8 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       change: 12.4,
       trend: 'up',
       target: 150000,
-      progress: 0.94
+      progress: 0.94,
+      status: 'Trending upward'
     },
     {
       id: 'coverage',
@@ -119,7 +121,8 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       change: 2.1,
       trend: 'up',
       target: 0.95,
-      progress: 0.86
+      progress: 0.86,
+      status: 'Strong coverage'
     },
     {
       id: 'alerts',
@@ -129,7 +132,8 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       trend: 'flat',
       target: 10,
       progress: 0.8,
-      annotation: 'Investigations open'
+      annotation: 'Investigations open',
+      status: 'Escalations active'
     }
   ],
   trends: {
@@ -159,8 +163,8 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       actor: 'Phoenix Monitor',
       action: 'Flagged suspicious login spike in APAC region',
       timestamp: new Date().toISOString(),
-      state: 'warning',
-      context: 'Escalated to Tier 2'
+      state: 'critical',
+      context: 'Escalated to Tier 2, MFA failure rate 41%'
     },
     {
       id: 'act-2',
@@ -168,14 +172,14 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       action: 'Auto-resolved 38 benign anomalies',
       timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
       state: 'success',
-      context: 'ML Confidence 93%'
+      context: 'ML confidence 93%'
     },
     {
       id: 'act-3',
       actor: 'Trust Graph',
       action: 'New high-signal connection from Finance Cloud',
       timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-      state: 'success',
+      state: 'info',
       context: 'Vetted by policy team'
     },
     {
@@ -183,7 +187,7 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       actor: 'Analyst Team',
       action: 'Opened investigation INV-9481 for persistent anomaly',
       timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-      state: 'danger',
+      state: 'warning',
       context: 'SLA 2h remaining'
     }
   ],

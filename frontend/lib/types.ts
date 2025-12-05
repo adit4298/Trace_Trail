@@ -9,6 +9,7 @@ export interface MetricSummary {
   target: number;
   progress: number; // 0-1 range
   annotation?: string;
+  status?: string;
 }
 
 export interface TrendPoint {
@@ -23,7 +24,7 @@ export interface TrendSeries {
   data: TrendPoint[];
 }
 
-export type ActivityState = 'success' | 'warning' | 'danger';
+export type ActivityState = 'success' | 'info' | 'warning' | 'critical';
 
 export interface Activity {
   id: string;
@@ -46,7 +47,10 @@ export interface Connection {
 }
 
 export type IconName =
+  | 'overview'
   | 'dashboard'
+  | 'signals'
+  | 'investigations'
   | 'insights'
   | 'activity'
   | 'connections'

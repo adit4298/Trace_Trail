@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { ThemeProvider } from '@/hooks/useTheme';
 
 import '../styles/globals.css';
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap'
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${spaceGrotesk.variable} h-full`} suppressHydrationWarning>
       <body className="h-full bg-background text-foreground">
         <ThemeProvider>
           <a href="#main-content" className="skip-link focus-ring">
