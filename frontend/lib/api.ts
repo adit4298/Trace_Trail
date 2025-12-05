@@ -81,6 +81,7 @@ const mockDashboardSnapshot: DashboardSnapshot = {
     { id: 'signals', label: 'Signals', href: '/signals', icon: 'signals', badge: 'Live' },
     { id: 'investigations', label: 'Investigations', href: '/investigations', icon: 'investigations' },
     { id: 'activity', label: 'Activity', href: '/activity', icon: 'activity' },
+    { id: 'accounts', label: 'Accounts', href: '/dashboard/accounts', icon: 'accounts' },
     { id: 'reports', label: 'Reports', href: '/reports', icon: 'reports' },
     { id: 'security', label: 'Security', href: '/security', icon: 'security' },
     { id: 'settings', label: 'Settings', href: '/settings', icon: 'settings' }

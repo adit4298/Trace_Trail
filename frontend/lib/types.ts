@@ -53,6 +53,7 @@ export type IconName =
   | 'investigations'
   | 'insights'
   | 'activity'
+  | 'accounts'
   | 'connections'
   | 'reports'
   | 'security'

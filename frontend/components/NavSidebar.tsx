@@ -31,6 +31,7 @@ const iconMap: Partial<Record<IconName, LucideIcon>> = {
   investigations: ScanSearch,
   insights: Sparkles,
   activity: Activity,
+  accounts: Share2,
   connections: Share2,
   reports: BarChart3,
   security: Shield,
