@@ -2,68 +2,74 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-export interface ApiOptions {
-    method?: HttpMethod;
-    body?: any;
-    token?: string;
-    headers?: Record<string, string>;
-    isFormData?: boolean;
+export interface ApiOptions<TBody = unknown> {
+  method?: HttpMethod;
+  body?: TBody;
+  token?: string;
+  headers?: Record<string, string>;
+  isFormData?: boolean;
 }
 
-async function apiRequest(path: string, options: ApiOptions = {}) {
-    const url = `${API_BASE_URL}${path}`;
+async function apiRequest<TResponse = unknown, TBody = unknown>(
+  path: string,
+  options: ApiOptions<TBody> = {}
+): Promise<TResponse> {
+  const url = `${API_BASE_URL ?? ''}${path}`;
 
-    const headers: Record<string, string> = {
-        ...(options.isFormData ? {} : { "Content-Type": "application/json" }),
-        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-        ...(options.headers || {})
-    };
+  const headers: Record<string, string> = {
+    ...(options.isFormData ? {} : { 'Content-Type': 'application/json' }),
+    ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+    ...(options.headers ?? {})
+  };
 
-    const fetchOptions: RequestInit = {
-        method: options.method || "GET",
-        headers,
-        body: options.isFormData ? options.body : JSON.stringify(options.body),
-    };
+  let body: BodyInit | undefined;
+  if (options.isFormData && options.body instanceof FormData) {
+    body = options.body;
+  } else if (!options.isFormData && typeof options.body !== 'undefined') {
+    body = JSON.stringify(options.body);
+  }
 
-    const res = await fetch(url, fetchOptions);
+  const fetchOptions: RequestInit = {
+    method: options.method ?? 'GET',
+    headers,
+    ...(body ? { body } : {})
+  };
 
-    // Handle non-2xx responses
-    if (!res.ok) {
-        const errorText = await res.text().catch(() => "");
-        throw new Error(`API Error ${res.status}: ${errorText}`);
-    }
+  const res = await fetch(url, fetchOptions);
 
-    // Try parsing JSON, fallback to text
-    try {
-        return await res.json();
-    } catch {
-        return await res.text();
-    }
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '');
+    throw new Error(`API Error ${res.status}: ${errorText}`);
+  }
+
+  try {
+    return (await res.json()) as TResponse;
+  } catch {
+    return (await res.text()) as TResponse;
+  }
 }
 
-// Shorthand helpers
-export const apiGet = (path: string, token?: string) =>
-    apiRequest(path, { method: "GET", token });
+export const apiGet = <TResponse = unknown>(path: string, token?: string) =>
+  apiRequest<TResponse>(path, { method: 'GET', token });
 
-export const apiPost = (path: string, body: any, token?: string) =>
-    apiRequest(path, { method: "POST", body, token });
+export const apiPost = <TResponse = unknown, TBody = unknown>(path: string, body: TBody, token?: string) =>
+  apiRequest<TResponse, TBody>(path, { method: 'POST', body, token });
 
-export const apiPut = (path: string, body: any, token?: string) =>
-    apiRequest(path, { method: "PUT", body, token });
+export const apiPut = <TResponse = unknown, TBody = unknown>(path: string, body: TBody, token?: string) =>
+  apiRequest<TResponse, TBody>(path, { method: 'PUT', body, token });
 
-export const apiPatch = (path: string, body: any, token?: string) =>
-    apiRequest(path, { method: "PATCH", body, token });
+export const apiPatch = <TResponse = unknown, TBody = unknown>(path: string, body: TBody, token?: string) =>
+  apiRequest<TResponse, TBody>(path, { method: 'PATCH', body, token });
 
-export const apiDelete = (path: string, token?: string) =>
-    apiRequest(path, { method: "DELETE", token });
+export const apiDelete = <TResponse = unknown>(path: string, token?: string) =>
+  apiRequest<TResponse>(path, { method: 'DELETE', token });
 
-// File upload
-export const apiFileUpload = (path: string, formData: FormData, token?: string) =>
-    apiRequest(path, {
-        method: "POST",
-        body: formData,
-        token,
-        isFormData: true
-    });
+export const apiFileUpload = <TResponse = unknown>(path: string, formData: FormData, token?: string) =>
+  apiRequest<TResponse, FormData>(path, {
+    method: 'POST',
+    body: formData,
+    token,
+    isFormData: true
+  });

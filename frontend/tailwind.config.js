@@ -12,10 +12,12 @@ module.exports = {
       colors: {
         background: 'rgb(var(--color-background) / <alpha-value>)',
         surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        'surface-muted': 'rgb(var(--color-surface-muted) / <alpha-value>)',
         muted: 'rgb(var(--color-muted) / <alpha-value>)',
         foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
         'primary-foreground': 'rgb(var(--color-primary-foreground) / <alpha-value>)',
+        accent: 'rgb(var(--color-accent) / <alpha-value>)',
         border: 'rgb(var(--color-border) / <alpha-value>)',
         success: 'rgb(var(--color-success) / <alpha-value>)',
         warning: 'rgb(var(--color-warning) / <alpha-value>)',

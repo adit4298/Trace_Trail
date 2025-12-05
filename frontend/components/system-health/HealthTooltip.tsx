@@ -21,20 +21,20 @@ export const HealthTooltip = ({
 }: HealthTooltipProps) => (
   <div
     className={clsx(
-      'pointer-events-none absolute bottom-full left-1/2 mb-4 w-64 -translate-x-1/2 rounded-2xl border border-white/10 bg-slate-900/90 p-4 text-sm text-white shadow-[0_20px_60px_rgba(3,7,18,0.8)] backdrop-blur-2xl transition-all duration-200',
+      'pointer-events-none absolute bottom-full left-1/2 mb-4 w-64 -translate-x-1/2 rounded-2xl border border-border/60 bg-surface p-4 text-sm text-foreground shadow-lg transition-all duration-200',
       visible ? 'opacity-100 translate-y-0' : 'translate-y-2 opacity-0'
     )}
   >
     <p className={clsx('text-xs uppercase tracking-[0.3em]', toneClass)}>{label}</p>
-    <p className="text-2xl font-semibold text-white">
+    <p className="text-2xl font-semibold text-foreground">
       {score.toFixed(1)}
-      <span className="text-sm text-slate-400"> / 100</span>
+      <span className="text-sm text-muted"> / 100</span>
     </p>
-    <p className="text-xs text-slate-400">Updated {formatRelative(updatedAt)}</p>
-    <p className="mt-2 text-xs text-slate-200">{description}</p>
+    <p className="text-xs text-muted">Updated {formatRelative(updatedAt)}</p>
+    <p className="mt-2 text-xs text-muted">{description}</p>
     <button
       type="button"
-      className="pointer-events-auto mt-3 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+      className="pointer-events-auto mt-3 rounded-xl border border-border/60 px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-surface-muted"
       onClick={onOpenDetails}
     >
       View system health

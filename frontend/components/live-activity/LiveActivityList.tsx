@@ -7,11 +7,14 @@ import type { ComponentProps } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import type { Activity } from '@/lib/types';
 
-const severityMap: Record<Activity['state'], { label: string; badge: ComponentProps<typeof Badge>['variant'] }> = {
-  info: { label: 'Info', badge: 'info' },
-  success: { label: 'Success', badge: 'success' },
-  warning: { label: 'Warning', badge: 'warning' },
-  critical: { label: 'Critical', badge: 'critical' }
+const severityMap: Record<
+  Activity['state'],
+  { label: string; badge: ComponentProps<typeof Badge>['variant'] }
+> = {
+  info: { label: 'FYI', badge: 'neutral' },
+  success: { label: 'Auto-resolved', badge: 'success' },
+  warning: { label: 'Needs review', badge: 'warning' },
+  critical: { label: 'High risk', badge: 'critical' }
 };
 
 interface LiveActivityListProps {
@@ -20,13 +23,15 @@ interface LiveActivityListProps {
 }
 
 export const LiveActivityList = ({ activities, onSelect }: LiveActivityListProps) => (
-  <div className="flex h-full flex-col gap-4 rounded-3xl border border-white/5 bg-white/5 p-6 text-white shadow-[0_30px_80px_rgba(3,7,18,0.65)] backdrop-blur-3xl">
+  <div className="flex h-full flex-col gap-4 rounded-[20px] border border-border/60 bg-surface p-6 text-foreground shadow-[0_16px_30px_rgba(8,10,12,0.25)]">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Live Activity</p>
-        <p className="text-xl font-semibold">Investigations & Signals</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-muted">Live Activity</p>
+        <p className="text-xl font-semibold">Friendly updates</p>
       </div>
-      <Badge variant="info">Streaming</Badge>
+      <Badge variant="info" soft>
+        Streaming
+      </Badge>
     </div>
 
     <ul className="flex-1 space-y-3 overflow-hidden">
@@ -38,18 +43,18 @@ export const LiveActivityList = ({ activities, onSelect }: LiveActivityListProps
               type="button"
               onClick={() => onSelect(activity)}
               className={clsx(
-                'w-full rounded-2xl border border-white/5 bg-slate-900/30 p-4 text-left transition hover:-translate-y-1 hover:border-cyan-200/30 hover:bg-slate-900/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60'
+                'w-full rounded-[16px] border border-border/60 bg-surface-muted/70 p-4 text-left transition hover:-translate-y-0.5 hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40'
               )}
             >
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={severity.badge}>{severity.label}</Badge>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-muted">
                   {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
                 </span>
               </div>
-              <p className="mt-3 text-base font-semibold text-white">{activity.action}</p>
-              <p className="text-sm text-slate-300">{activity.context}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-slate-500">{activity.actor}</p>
+              <p className="mt-3 text-base font-semibold text-foreground">{activity.action}</p>
+              <p className="text-sm text-muted">{activity.context}</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-muted">{activity.actor}</p>
             </button>
           </li>
         );

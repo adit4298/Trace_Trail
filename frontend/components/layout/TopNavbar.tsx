@@ -30,44 +30,45 @@ export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-slate-900/60 backdrop-blur-2xl">
-      <div className="flex items-center gap-4 px-4 py-4 lg:px-8">
+    <header className="sticky top-0 z-30 border-b border-border/50 bg-surface/95 backdrop-blur-md">
+      <div className="flex items-center gap-3 px-4 py-4 lg:px-8">
         <button
           type="button"
-          className="rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-200 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 lg:hidden"
+          className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface"
           aria-label="Open navigation"
           onClick={onOpenSidebar}
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="hidden flex-col leading-tight text-white lg:flex">
-          <span className="text-xs uppercase tracking-[0.3em] text-cyan-300/80">TraceTrail</span>
-          <span className="text-lg font-semibold">TraceTrail Intelligence Cloud</span>
+        <div className="hidden flex-col leading-tight text-foreground lg:flex">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">TraceTrail</span>
+          <span className="text-lg font-semibold">Security Companion</span>
+          <span className="text-xs text-muted">Friendly insights for your digital life</span>
         </div>
 
         <form className="relative flex-1" role="search" aria-label="Global search">
           <label htmlFor="global-search" className="sr-only">
             Search signals, cases, anomalies
           </label>
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             id="global-search"
             type="search"
             placeholder="Search signals, cases, anomalies…"
-            className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-12 pr-24 text-sm text-white placeholder:text-slate-400 transition focus:border-cyan-400/60 focus:bg-slate-900/40 focus:outline-none"
+            className="w-full rounded-full border border-border/60 bg-surface-muted/80 py-3 pl-12 pr-24 text-sm text-foreground placeholder:text-muted focus:border-primary/50 focus:outline-none"
           />
-          <div className="pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+          <div className="pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-full border border-border/60 bg-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
             <Command className="h-3 w-3" />
             <span>K</span>
           </div>
         </form>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Tooltip content="Toggle dark / light theme">
             <button
               type="button"
-              className="rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-200 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+              className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               onClick={toggleTheme}
               aria-label="Toggle theme"
             >
@@ -78,12 +79,12 @@ export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps
           <Tooltip content="Notifications">
             <button
               type="button"
-              className="relative rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-200 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+              className="relative rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-label="View notifications"
             >
               <Bell className="h-5 w-5" />
               {notifications > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-rose-500 to-orange-400 text-[10px] font-semibold">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-warning/80 text-[10px] font-semibold text-primary-foreground">
                   {notifications}
                 </span>
               ) : null}
@@ -93,7 +94,7 @@ export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps
           <div className="relative" ref={profileRef}>
             <button
               type="button"
-              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 py-1 pr-3 text-left transition hover:shadow-[0_15px_35px_rgba(8,145,178,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+              className="flex items-center gap-3 rounded-2xl border border-border/60 bg-surface-muted/80 px-2 py-1 pr-3 text-left transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-haspopup="menu"
               aria-expanded={profileOpen}
               onClick={() => setProfileOpen((prev) => !prev)}
@@ -107,37 +108,37 @@ export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps
                   sizes="40px"
                 />
               </span>
-              <span className="hidden flex-col text-sm text-white sm:flex">
+              <span className="hidden flex-col text-sm text-foreground sm:flex">
                 <span className="font-semibold">{user.name}</span>
-                <span className="text-xs text-slate-400">{user.title}</span>
+                <span className="text-xs text-muted">{user.title}</span>
               </span>
             </button>
 
             {profileOpen ? (
               <div
                 role="menu"
-                className="absolute right-0 mt-3 w-56 rounded-2xl border border-white/10 bg-slate-900/95 p-3 text-sm text-slate-200 shadow-[0_25px_70px_rgba(3,7,18,0.65)] backdrop-blur-2xl"
+                className="absolute right-0 mt-3 w-56 rounded-2xl border border-border/50 bg-surface p-3 text-sm text-foreground shadow-lg"
               >
-                <div className="mb-3 rounded-2xl border border-white/5 bg-white/5 p-3">
-                  <p className="text-sm font-semibold text-white">{user.name}</p>
-                  <p className="text-xs text-slate-400">{user.title}</p>
-                  <p className="text-xs text-slate-500">{user.organization}</p>
+                <div className="mb-3 rounded-2xl border border-border/40 bg-surface-muted/60 p-3">
+                  <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                  <p className="text-xs text-muted">{user.title}</p>
+                  <p className="text-xs text-muted">{user.organization}</p>
                 </div>
                 <button
                   type="button"
-                  className="w-full rounded-xl px-3 py-2 text-left text-slate-200 transition hover:bg-white/5"
+                  className="w-full rounded-xl px-3 py-2 text-left text-foreground transition hover:bg-surface-muted"
                 >
                   View profile
                 </button>
                 <button
                   type="button"
-                  className="w-full rounded-xl px-3 py-2 text-left text-slate-200 transition hover:bg-white/5"
+                  className="w-full rounded-xl px-3 py-2 text-left text-foreground transition hover:bg-surface-muted"
                 >
                   Preferences
                 </button>
                 <button
                   type="button"
-                  className="mt-2 w-full rounded-xl bg-gradient-to-r from-cyan-400/20 to-indigo-500/20 px-3 py-2 text-left font-semibold text-white transition hover:from-cyan-400/30 hover:to-indigo-500/30"
+                  className="mt-2 w-full rounded-xl bg-primary/20 px-3 py-2 text-left font-semibold text-foreground transition hover:bg-primary/30"
                 >
                   Sign out
                 </button>

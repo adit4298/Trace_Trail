@@ -1,7 +1,17 @@
 'use client';
 
 import clsx from 'clsx';
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Minus } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Fingerprint,
+  Lock,
+  Minus,
+  Radar,
+  ShieldCheck
+} from 'lucide-react';
 import { memo, useMemo } from 'react';
 
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -21,7 +31,21 @@ const sparklineMap: Record<string, number[]> = {
   alerts: [9, 10, 12, 11, 12, 13, 12, 12]
 };
 
-const getSparkline = (id: string) => sparklineMap[id] ?? [10, 12, 11, 15, 13, 16, 18, 17];
+const metricIconMap: Record<string, typeof ShieldCheck> = {
+  'risk-score': ShieldCheck,
+  signals: Radar,
+  coverage: Fingerprint,
+  alerts: AlertTriangle
+};
+
+const metricCopyFallback: Record<string, string> = {
+  'risk-score': 'Overall balance of detections and resolved alerts.',
+  signals: 'Signals processed in the last sync window.',
+  coverage: 'Percent of devices and accounts watched.',
+  alerts: 'Items waiting for a quick review.'
+};
+
+const getSparkline = (id: string) => sparklineMap[id] ?? [14, 16, 15, 18, 17, 19, 20, 22];
 
 const splitValue = (value: string) => {
   const match = value.match(/^([\d.,]+)\s*(.*)$/);
@@ -48,51 +72,55 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
     return `${animatedValue.toFixed(isWhole ? 0 : 1)}${suffix ? ` ${suffix}` : ''}`;
   }, [animatedValue, suffix, numeric]);
 
-  const changeTone = metric.trend === 'up' ? 'text-emerald-300' : metric.trend === 'down' ? 'text-rose-300' : 'text-slate-400';
+  const changeTone =
+    metric.trend === 'up' ? 'text-success' : metric.trend === 'down' ? 'text-danger' : 'text-muted';
   const ChangeIcon = metric.trend === 'up' ? ArrowUpRight : metric.trend === 'down' ? ArrowDownRight : Minus;
   const clampedProgress = Math.min(1, Math.max(0, metric.progress));
   const sparkline = useMemo(() => getSparkline(metric.id), [metric.id]);
+  const MetricIcon = metricIconMap[metric.id] ?? Lock;
+  const helperCopy = metric.annotation ?? metricCopyFallback[metric.id] ?? 'Live metric from your workspace.';
 
   return (
-    <article
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       aria-pressed={isActive}
       onClick={() => onSelect?.(metric)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onSelect?.(metric);
-        }
-      }}
       className={clsx(
-        'group relative flex flex-col gap-4 overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-white/10 via-white/5 to-white/0 p-6 text-white shadow-[0_25px_60px_rgba(2,6,23,0.65)] backdrop-blur-3xl transition-transform duration-200',
-        'hover:-translate-y-1 hover:border-cyan-200/40 hover:shadow-[0_35px_80px_rgba(6,182,212,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70',
-        isActive && 'ring-2 ring-cyan-300/60'
+        'group relative flex flex-col gap-5 rounded-[18px] border border-border/60 bg-surface p-5 text-left text-foreground shadow-[0_16px_35px_rgba(7,9,12,0.35)] transition duration-200',
+        'hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(7,9,12,0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+        isActive && 'ring-2 ring-primary/50'
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-slate-400">{metric.label}</p>
-          {metric.annotation ? (
-            <p className="text-[13px] text-slate-300/90">{metric.annotation}</p>
-          ) : null}
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <MetricIcon className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-foreground">{metric.label}</p>
+            <p className="text-xs text-muted">{helperCopy}</p>
+          </div>
         </div>
         <Tooltip
           content={
             <span className="flex items-center gap-1">
-              {metric.trend === 'up' ? 'Improving' : metric.trend === 'down' ? 'Declining' : 'Steady'} •{' '}
+              {metric.trend === 'up'
+                ? 'Improving'
+                : metric.trend === 'down'
+                  ? 'Easing back'
+                  : 'Holding steady'}{' '}
+              •{' '}
               {metric.status ?? 'Last 24h trend'}
             </span>
           }
         >
           <span
             className={clsx(
-              'inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold',
+              'inline-flex items-center gap-1 rounded-full border border-border/60 bg-surface-muted/70 px-3 py-1 text-xs font-semibold',
               changeTone
             )}
           >
-            <ChangeIcon className="h-3.5 w-3.5" />
+            <ChangeIcon className="h-3.5 w-3.5" aria-hidden="true" />
             {metric.change > 0 ? '+' : ''}
             {metric.change.toFixed(1)}%
           </span>
@@ -101,12 +129,12 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
 
       <div className="flex items-end justify-between">
         <p className="text-4xl font-semibold tracking-tight">{formattedValue}</p>
-        {metric.status ? <p className="text-sm text-slate-300">{metric.status}</p> : null}
+        {metric.status ? <p className="text-sm text-muted">{metric.status}</p> : null}
       </div>
 
       <div className="space-y-3">
         <div
-          className="relative h-2 w-full overflow-hidden rounded-full bg-white/10"
+          className="relative h-1.5 w-full overflow-hidden rounded-full bg-surface-muted"
           role="progressbar"
           aria-label={`${metric.label} progress`}
           aria-valuenow={Math.round(clampedProgress * 100)}
@@ -115,8 +143,8 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
         >
           <span
             className={clsx(
-              'absolute inset-y-0 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 transition-[width] duration-500',
-              metric.trend === 'down' && 'from-rose-400 via-orange-400 to-amber-400'
+              'absolute inset-y-0 rounded-full bg-primary transition-[width] duration-500',
+              metric.trend === 'down' && 'bg-danger'
             )}
             style={{ width: `${clampedProgress * 100}%` }}
           />
@@ -124,14 +152,14 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
         <MiniSparkline data={sparkline} trend={metric.trend} />
       </div>
 
-      <div className="flex items-center justify-between text-xs text-slate-400">
+      <div className="flex items-center justify-between text-xs text-muted">
         <span>Target {metric.target.toLocaleString()}</span>
-        <span className="inline-flex items-center gap-1 text-cyan-300">
-          Inspect
+        <span className="inline-flex items-center gap-1 text-primary">
+          Details
           <ArrowRight className="h-3 w-3" />
         </span>
       </div>
-    </article>
+    </button>
   );
 };
 
@@ -149,14 +177,13 @@ const MiniSparkline = memo(({ data, trend }: MiniSparklineProps) => {
     return `${x},${50 - y}`;
   });
 
-  const strokeColor =
-    trend === 'down' ? 'rgba(248,113,113,0.9)' : trend === 'up' ? 'rgba(94,234,212,0.9)' : 'rgba(148,163,184,0.9)';
+  const strokeColor = trend === 'down' ? '#D9534F' : trend === 'up' ? '#47B0E7' : '#6B7685';
 
   return (
-    <svg viewBox="0 0 100 50" className="h-14 w-full">
+    <svg viewBox="0 0 100 50" className="h-16 w-full">
       <defs>
         <linearGradient id="sparklineGradient" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={strokeColor} stopOpacity="0.45" />
+          <stop offset="0%" stopColor={strokeColor} stopOpacity="0.35" />
           <stop offset="100%" stopColor={strokeColor} stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -164,13 +191,13 @@ const MiniSparkline = memo(({ data, trend }: MiniSparklineProps) => {
         d={`M0,50 L${normalized.join(' ')} L100,50 Z`}
         fill="url(#sparklineGradient)"
         stroke="none"
-        opacity={0.7}
+        opacity={0.8}
       />
       <polyline
         points={normalized.join(' ')}
         fill="none"
         stroke={strokeColor}
-        strokeWidth={2}
+        strokeWidth={2.3}
         strokeLinecap="round"
         className="animate-pulse-soft"
       />

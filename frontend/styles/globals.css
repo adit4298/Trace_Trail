@@ -4,31 +4,35 @@
 
 :root {
   --font-sans: 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --color-background: 6 11 25;
-  --color-surface: 9 15 32;
-  --color-muted: 148 163 184;
-  --color-foreground: 226 232 240;
-  --color-primary: 45 212 191;
-  --color-primary-foreground: 3 7 18;
-  --color-border: 34 45 68;
-  --color-success: 16 185 129;
-  --color-warning: 245 158 11;
-  --color-danger: 248 113 113;
-  --shadow-soft: 0 30px 80px rgba(2, 6, 23, 0.65);
+  --color-background: 17 20 24;
+  --color-surface: 27 31 35;
+  --color-surface-muted: 22 26 30;
+  --color-muted: 150 162 178;
+  --color-foreground: 237 241 247;
+  --color-primary: 71 176 231;
+  --color-primary-foreground: 12 18 24;
+  --color-accent: 75 198 169;
+  --color-border: 45 52 59;
+  --color-success: 75 198 169;
+  --color-warning: 249 177 76;
+  --color-danger: 217 83 79;
+  --shadow-soft: 0 20px 40px rgba(5, 7, 10, 0.45);
 }
 
 [data-theme='light'] {
-  --color-background: 245 247 255;
+  --color-background: 247 249 253;
   --color-surface: 255 255 255;
-  --color-muted: 71 85 105;
-  --color-foreground: 15 23 42;
-  --color-primary: 79 70 229;
+  --color-surface-muted: 248 250 253;
+  --color-muted: 96 104 116;
+  --color-foreground: 14 24 36;
+  --color-primary: 60 120 240;
   --color-primary-foreground: 255 255 255;
-  --color-border: 219 234 254;
-  --color-success: 16 185 129;
+  --color-accent: 61 186 156;
+  --color-border: 213 219 230;
+  --color-success: 46 160 133;
   --color-warning: 245 158 11;
-  --color-danger: 239 68 68;
-  --shadow-soft: 0 25px 50px rgba(15, 23, 42, 0.3);
+  --color-danger: 220 80 80;
+  --shadow-soft: 0 16px 32px rgba(15, 23, 42, 0.14);
 }
 
 @layer base {
@@ -38,9 +42,11 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    background-image: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 45%),
-      radial-gradient(circle at 80% 0%, rgba(129, 140, 248, 0.15), transparent 50%);
-    background-color: #030712;
+    background-color: rgb(var(--color-background));
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 140px 140px, 140px 140px;
   }
 
   ::selection {
@@ -53,8 +59,11 @@
     @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
   }
 
-  .glass-panel {
-    @apply rounded-3xl border border-white/5 bg-white/5 shadow-[0_30px_80px_rgba(3,7,18,0.65)] backdrop-blur-3xl;
+  .surface-card {
+    border-radius: 1.15rem;
+    background: rgb(var(--color-surface));
+    border: 1px solid rgb(var(--color-border) / 0.65);
+    box-shadow: 0 14px 30px rgba(5, 7, 10, 0.45);
   }
 
   .skip-link {

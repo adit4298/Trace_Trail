@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from 'react';
 
-import { MetricCard } from '@/components/cards/MetricCard';
-import { MetricDetailPanel } from '@/components/cards/MetricDetailPanel';
 import { ActivityDetailDrawer } from '@/components/live-activity/ActivityDetailDrawer';
 import { LiveActivityList } from '@/components/live-activity/LiveActivityList';
-import { TrendChart } from '@/components/charts/TrendChart';
+import { MetricCard } from '@/components/cards/MetricCard';
+import { MetricDetailPanel } from '@/components/cards/MetricDetailPanel';
 import { SystemHealthAvatar } from '@/components/system-health/SystemHealthAvatar';
+import { TrendChart } from '@/components/charts/TrendChart';
 import type { Activity, DashboardSnapshot, MetricSummary, TrendSeries } from '@/lib/types';
 
 type RangeOption = '24h' | '7d' | '14d' | '30d';
@@ -26,7 +26,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
   const healthBreakdown = useHealthBreakdown(snapshot.metrics, snapshot.trends);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <section aria-label="Key metrics" className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {snapshot.metrics.map((metric) => (
           <MetricCard
@@ -74,9 +74,9 @@ const useHealthBreakdown = (metrics: MetricSummary[], trends: TrendSeries) =>
       signalVolume,
       trend: trends.data.slice(-10).map((point) => point.value),
       recommendations: [
-        'Investigate APAC login spike impacting MFA success.',
-        'Route low-confidence anomalies to Copilot for auto-triage.',
-        'Boost collector coverage in EMEA edge locations.'
+        'Give the APAC login spike a quick look to confirm it was you.',
+        'Let Signal Copilot auto-triage lower confidence events to save time.',
+        'Extend device coverage to a few older laptops in EMEA for extra confidence.'
       ]
     };
   }, [metrics, trends.data]);

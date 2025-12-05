@@ -2,11 +2,10 @@
 
 import { useCallback, useState, type ReactNode } from 'react';
 
-import type { NavItem, UserProfile } from '@/lib/types';
-
 import { AnimatedBackground } from './layout/AnimatedBackground';
 import { NavSidebar } from './NavSidebar';
 import { TopNavbar } from './layout/TopNavbar';
+import type { NavItem, UserProfile } from '@/lib/types';
 
 interface AppShellProps {
   navItems: NavItem[];
@@ -22,7 +21,7 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
   const closeNav = useCallback(() => setIsNavOpen(false), []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <AnimatedBackground />
 
       <div className="relative z-10 flex min-h-screen">
@@ -32,15 +31,15 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         />
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col bg-background/95">
           <TopNavbar notifications={notifications} user={user} onOpenSidebar={() => setIsNavOpen(true)} />
 
           <main
             id="main-content"
             role="main"
-            className="flex flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-10"
+            className="flex flex-1 flex-col gap-8 px-4 py-8 sm:px-6 lg:px-12"
           >
-            {children}
+            <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8">{children}</div>
           </main>
         </div>
       </div>
@@ -52,12 +51,12 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
           aria-modal="true"
           aria-label="Navigation drawer"
         >
-          <div className="absolute inset-y-0 left-0 flex h-full w-72 flex-col bg-slate-950/90">
+          <div className="absolute inset-y-0 left-0 flex h-full w-72 flex-col bg-[#14181f]">
             <div className="flex items-center justify-between px-4 py-4 text-sm">
-              <p className="font-semibold uppercase tracking-[0.3em] text-slate-300">Navigate</p>
+              <p className="font-semibold uppercase tracking-[0.3em] text-muted">Navigate</p>
               <button
                 type="button"
-                className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase text-slate-300"
+                className="rounded-full border border-border/60 px-3 py-1 text-xs uppercase text-muted"
                 onClick={closeNav}
               >
                 Close

@@ -55,7 +55,7 @@ export const SystemHealthAvatar = ({
         <button
           type="button"
           className={clsx(
-            'relative pointer-events-auto flex flex-col items-center gap-2 rounded-3xl border border-white/5 bg-slate-900/30 p-3 text-xs text-white shadow-[0_30px_80px_rgba(3,7,18,0.65)] backdrop-blur-2xl transition hover:-translate-y-1.5',
+            'relative pointer-events-auto flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-3 text-xs text-foreground shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1',
             status.glow
           )}
           onMouseEnter={() => setHovered(true)}
@@ -73,11 +73,12 @@ export const SystemHealthAvatar = ({
               glowClass={status.glow}
               pulseClass={status.pulseClass}
             />
-            <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
+            <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-foreground drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
               {Math.round(score)}
             </span>
           </div>
-          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-300">{status.label}</span>
+          <span className="text-[11px] uppercase tracking-[0.3em] text-muted">{status.label}</span>
+          <span className="text-[10px] text-muted">Tap for details</span>
           <HealthTooltip
             visible={hovered}
             label={status.label}

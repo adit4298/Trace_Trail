@@ -10,8 +10,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "."
+    "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",
@@ -28,11 +27,14 @@
     "tailwindcss": {
       "whitelist": [
         "bg-surface",
+        "bg-surface-muted",
         "text-foreground",
+        "text-muted",
         "border-border",
         "shadow-soft"
       ]
-    }
+    },
+    "import/core-modules": ["server-only"]
   },
   "rules": {
     "@typescript-eslint/consistent-type-imports": [
@@ -50,6 +52,7 @@
         "varsIgnorePattern": "^_"
       }
     ],
+    "import/no-named-as-default": "off",
     "import/order": [
       "error",
       {
@@ -72,6 +75,8 @@
     ],
     "jsx-a11y/anchor-is-valid": "off",
     "tailwindcss/classnames-order": "warn",
+    "tailwindcss/enforces-shorthand": "off",
+    "tailwindcss/enforces-negative-arbitrary-values": "off",
     "tailwindcss/no-custom-classname": "off"
   }
 }

@@ -6,6 +6,7 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  Fingerprint,
   Gauge,
   LayoutDashboard,
   LucideIcon,
@@ -13,7 +14,7 @@ import {
   ScanSearch,
   Settings,
   Share2,
-  ShieldCheck,
+  Shield,
   Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
@@ -32,7 +33,7 @@ const iconMap: Partial<Record<IconName, LucideIcon>> = {
   activity: Activity,
   connections: Share2,
   reports: BarChart3,
-  security: ShieldCheck,
+  security: Shield,
   settings: Settings
 };
 
@@ -52,88 +53,118 @@ export const NavSidebar = ({
   variant = 'default'
 }: NavSidebarProps) => {
   const pathname = usePathname();
+  const primaryIds = new Set<IconName>(['overview', 'signals', 'investigations', 'activity', 'reports']);
+  const primary = items.filter((item) => primaryIds.has(item.icon));
+  const secondary = items.filter((item) => !primaryIds.has(item.icon));
 
   return (
     <aside
       className={clsx(
-        'group/sidebar relative z-20 flex-col border-r border-white/5 bg-slate-900/40 backdrop-blur-2xl transition-all duration-300',
+        'relative z-20 flex-col border-r border-border/40 bg-[#14181f] transition-all duration-300',
         variant === 'default' ? 'hidden lg:flex' : 'flex',
-        collapsed ? 'w-20' : 'w-64'
+        collapsed ? 'w-[4.75rem]' : 'w-64'
       )}
       aria-label="Primary navigation"
     >
-      <div className="flex flex-1 flex-col gap-6 px-4 py-6">
-        <nav>
-          <ul className="space-y-1">
-            {items.map((item) => {
-              const Icon = iconMap[item.icon] ?? Gauge;
-              const isActive =
-                pathname === item.href || (item.href !== '/' && pathname.startsWith(`${item.href}/`));
+      <div className="flex flex-1 flex-col gap-6 px-3 py-6">
+        <div className={clsx('flex items-center gap-3 px-2', collapsed && 'justify-center')}>
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+            <Fingerprint className="h-5 w-5" />
+          </div>
+          {!collapsed ? (
+            <div>
+              <p className="text-sm font-semibold text-foreground">TraceTrail</p>
+              <p className="text-xs text-muted">Security Center</p>
+            </div>
+          ) : null}
+        </div>
 
-              const linkContent = (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={onNavigate}
-                  className={clsx(
-                    'group/nav relative flex items-center gap-3 overflow-hidden rounded-2xl px-3 py-3 text-sm font-semibold tracking-wide transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70',
-                    'ring-1 ring-white/5 backdrop-blur',
-                    isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 via-cyan-400/10 to-transparent text-white shadow-[0_10px_30px_rgba(6,182,212,0.25)]'
-                      : 'text-slate-300 hover:text-white hover:shadow-[0_20px_45px_rgba(6,182,212,0.15)] hover:ring-cyan-400/40'
-                  )}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <span
-                    className={clsx(
-                      'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-white/5 text-cyan-300 transition-all duration-200',
-                      'shadow-[inset_0_0_15px_rgba(94,234,212,0.25)] group-hover/nav:bg-cyan-400/20',
-                      collapsed && 'mx-auto'
-                    )}
-                  >
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-
+        <nav className="flex-1 space-y-6">
+          {[{ label: 'Protection', items: primary }, { label: 'Workspace', items: secondary }].map(
+            (section) =>
+              section.items.length > 0 && (
+                <div key={section.label} className="space-y-2">
                   {!collapsed ? (
-                    <span className="flex flex-1 items-center justify-between">
-                      <span className="ml-1 flex flex-col">
-                        <span className="text-base">{item.label}</span>
-                        <span className="text-xs text-slate-400 transition group-hover/nav:text-slate-200">
-                          {isActive ? 'Currently viewing' : 'Jump to panel'}
-                        </span>
-                      </span>
-                      {item.badge ? (
-                        <Badge variant="info" soft className="text-[10px] uppercase tracking-widest">
-                          {item.badge}
-                        </Badge>
-                      ) : null}
-                    </span>
+                    <p className="px-2 text-xs font-semibold uppercase tracking-[0.3em] text-muted/70">
+                      {section.label}
+                    </p>
                   ) : null}
-                </Link>
-              );
+                  <ul className="space-y-1.5">
+                    {section.items.map((item) => {
+                      const Icon = iconMap[item.icon] ?? Gauge;
+                      const isActive =
+                        pathname === item.href ||
+                        (item.href !== '/' && pathname.startsWith(`${item.href}/`));
 
-              return (
-                <li key={item.id}>
-                  {collapsed ? (
-                    <Tooltip content={item.label} side="right" align="center">
-                      {linkContent}
-                    </Tooltip>
-                  ) : (
-                    linkContent
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                      const content = (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          onClick={onNavigate}
+                          className={clsx(
+                            'group/nav relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                            isActive
+                              ? 'bg-surface text-foreground shadow-sm'
+                              : 'text-muted hover:bg-surface-muted/60 hover:text-foreground'
+                          )}
+                          aria-current={isActive ? 'page' : undefined}
+                        >
+                          <span
+                            className={clsx(
+                              'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl border border-border/60 text-primary transition-transform group-hover/nav:scale-[1.04]',
+                              isActive && 'border-primary/60 bg-primary/10 text-primary'
+                            )}
+                          >
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                          </span>
+
+                          {!collapsed ? (
+                            <span className="flex flex-1 items-center justify-between">
+                              <span className="flex flex-col">
+                                <span>{item.label}</span>
+                                <span className="text-xs text-muted">
+                                  {isActive ? 'Active' : 'View insights'}
+                                </span>
+                              </span>
+                              {item.badge ? (
+                                <Badge variant="info" soft className="text-[10px] uppercase tracking-wide">
+                                  {item.badge}
+                                </Badge>
+                              ) : null}
+                            </span>
+                          ) : null}
+
+                          {isActive ? (
+                            <span className="absolute inset-y-2 left-1 w-1 rounded-full bg-primary" aria-hidden="true" />
+                          ) : null}
+                        </Link>
+                      );
+
+                      return (
+                        <li key={item.id}>
+                          {collapsed ? (
+                            <Tooltip content={item.label} side="right">
+                              {content}
+                            </Tooltip>
+                          ) : (
+                            content
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )
+          )}
         </nav>
       </div>
 
       {variant === 'default' ? (
-        <div className="border-t border-white/5 px-4 py-4">
+        <div className="border-t border-border/40 px-3 py-4">
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-2 text-xs font-semibold uppercase tracking-wide text-slate-300 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-surface-muted/60 py-2 text-xs font-semibold uppercase tracking-wide text-muted transition hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

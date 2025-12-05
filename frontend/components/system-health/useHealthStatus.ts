@@ -15,40 +15,40 @@ export interface HealthStatusConfig {
 
 const HEALTH_CONFIG: Record<HealthState, Omit<HealthStatusConfig, 'state'>> = {
   healthy: {
-    label: 'Healthy',
-    description: 'Systems stable. No immediate action required.',
-    gradient: 'from-cyan-300 via-cyan-400 to-emerald-300',
-    glow: 'shadow-[0_0_35px_rgba(34,211,238,0.55)]',
-    ringClass: 'border-cyan-300/70',
+    label: 'All good',
+    description: 'Your digital presence looks calm and protected.',
+    gradient: 'from-[#4BC6A9] via-[#5dd6ba] to-[#bcebdc]',
+    glow: 'shadow-[0_12px_35px_rgba(75,198,169,0.35)]',
+    ringClass: 'border-[#4BC6A9]/70',
     pulseClass: 'animate-health-breathe-slow',
-    tooltipTone: 'text-cyan-200'
+    tooltipTone: 'text-[#4BC6A9]'
   },
   moderate: {
-    label: 'Moderate',
-    description: 'Monitoring new anomalies. Stay alert.',
-    gradient: 'from-amber-200 via-amber-300 to-amber-400',
-    glow: 'shadow-[0_0_35px_rgba(251,191,36,0.45)]',
-    ringClass: 'border-amber-300/70',
+    label: 'Keep an eye',
+    description: 'A few items need watching, but nothing urgent.',
+    gradient: 'from-[#F4C77C] via-[#F7D59F] to-[#FDF0D3]',
+    glow: 'shadow-[0_12px_35px_rgba(244,199,124,0.35)]',
+    ringClass: 'border-[#F4C77C]/70',
     pulseClass: 'animate-health-breathe-medium',
-    tooltipTone: 'text-amber-200'
+    tooltipTone: 'text-[#F5C688]'
   },
   warning: {
-    label: 'Warning',
-    description: 'Escalations pending. Review open investigations.',
-    gradient: 'from-orange-300 via-orange-400 to-rose-400',
-    glow: 'shadow-[0_0_35px_rgba(251,146,60,0.55)]',
-    ringClass: 'border-orange-300/70',
+    label: 'Caution',
+    description: 'We spotted changes worth a gentle review soon.',
+    gradient: 'from-[#F1A45F] via-[#F7BE8C] to-[#FFE1C9]',
+    glow: 'shadow-[0_12px_35px_rgba(241,164,95,0.35)]',
+    ringClass: 'border-[#F1A45F]/70',
     pulseClass: 'animate-health-breathe-fast',
-    tooltipTone: 'text-orange-200'
+    tooltipTone: 'text-[#F1A45F]'
   },
   critical: {
-    label: 'Critical',
-    description: 'High-risk posture. Immediate action needed.',
-    gradient: 'from-rose-400 via-rose-500 to-red-500',
-    glow: 'shadow-[0_0_35px_rgba(248,113,113,0.7)]',
-    ringClass: 'border-rose-400/70',
+    label: 'Take a look',
+    description: 'A few sensitive items need your quick confirmation.',
+    gradient: 'from-[#EB8E8B] via-[#F3A3A1] to-[#FFD9D8]',
+    glow: 'shadow-[0_12px_35px_rgba(235,142,139,0.4)]',
+    ringClass: 'border-[#EB8E8B]/70',
     pulseClass: 'animate-health-breathe-critical',
-    tooltipTone: 'text-rose-200'
+    tooltipTone: 'text-[#EB8E8B]'
   }
 };
 

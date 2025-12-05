@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Space_Grotesk } from 'next/font/google';
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { ThemeProvider } from '@/hooks/useTheme';
