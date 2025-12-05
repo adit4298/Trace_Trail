@@ -24,6 +24,64 @@ interface SectionConfig {
 }
 
 const SECTION_CONTENT: Record<string, SectionConfig> = {
+  signals: {
+    title: 'Signals',
+    description:
+      'Friendly pulse on the events TraceTrail monitored for you today. Use this view to understand volume, accuracy, and freshness.',
+    highlights: [
+      { id: 'volume', label: 'Signals processed', value: '142k', delta: '+12.4%', tone: 'positive', detail: 'vs yesterday' },
+      { id: 'precision', label: 'Precision', value: '98.2%', delta: '+1.3%', tone: 'positive', detail: 'Model confidence' },
+      { id: 'latency', label: 'Avg. latency', value: '420 ms', delta: '-75 ms', tone: 'positive', detail: 'End-to-end' }
+    ],
+    insights: [
+      {
+        title: 'Morning sync',
+        description: 'All regions synced on schedule. APAC produced 38% of today’s insights thanks to holiday shopping traffic.'
+      },
+      {
+        title: 'Auto-labeling',
+        description: 'Signal Copilot re-labeled 1.2k benign anomalies. You can lighten analyst load by enabling digest mode.'
+      },
+      {
+        title: 'Data freshness',
+        description: 'Two partner feeds briefly lagged by ~3 minutes. System caught up automatically, but we flagged for visibility.'
+      }
+    ],
+    checklist: [
+      'Share signal highlights with teammates via the daily digest.',
+      'Skim the “new sources” tab to approve incoming feeds.',
+      'Review auto-labeling suggestions before the weekend.'
+    ]
+  },
+  investigations: {
+    title: 'Investigations',
+    description:
+      'Simple overview of open cases and recent escalations so you can keep tabs on what needs human attention.',
+    highlights: [
+      { id: 'open', label: 'Open investigations', value: '37', delta: '-5 vs yesterday', tone: 'positive' },
+      { id: 'sla', label: 'SLA at risk', value: '3', delta: '+1 case', tone: 'negative', detail: 'Requires a quick review' },
+      { id: 'auto', label: 'Auto-resolved (24h)', value: '112', delta: '+22%', tone: 'positive' }
+    ],
+    insights: [
+      {
+        title: 'Escalations',
+        description: 'Phoenix Monitor nudged three “High Risk” login clusters to Tier 2. They are waiting in your queue.'
+      },
+      {
+        title: 'People bandwidth',
+        description: 'Average investigator queue time is 18 minutes—well within the comfortable range this week.'
+      },
+      {
+        title: 'Recommendations',
+        description: 'Consider pairing new analysts with automation traces so they learn why certain cases close themselves.'
+      }
+    ],
+    checklist: [
+      'Double-check the few items with SLA warnings.',
+      'Document any manual overrides you applied today.',
+      'Celebrate the auto-resolved wins with your team!'
+    ]
+  },
   insights: {
     title: 'Strategic Insights',
     description:
