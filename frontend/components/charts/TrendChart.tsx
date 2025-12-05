@@ -3,6 +3,7 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts';
 
 import { Badge } from '@/components/ui/Badge';
+
 import type { TrendSeries } from '@/lib/types';
 
 type RangeOption = '24h' | '7d' | '14d' | '30d';

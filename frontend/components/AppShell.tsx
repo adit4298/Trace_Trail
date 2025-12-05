@@ -3,8 +3,9 @@
 import { useCallback, useState, type ReactNode } from 'react';
 
 import { AnimatedBackground } from './layout/AnimatedBackground';
-import { NavSidebar } from './NavSidebar';
 import { TopNavbar } from './layout/TopNavbar';
+import { NavSidebar } from './NavSidebar';
+
 import type { NavItem, UserProfile } from '@/lib/types';
 
 interface AppShellProps {

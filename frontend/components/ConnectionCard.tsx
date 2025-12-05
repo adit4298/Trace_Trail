@@ -1,9 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
+import { formatDistanceToNow } from 'date-fns';
 import { ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
 
 import type { Connection } from '@/lib/types';
 

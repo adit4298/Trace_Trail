@@ -1,7 +1,17 @@
+/* eslint-disable tailwindcss/classnames-order */
 'use client';
 
 import clsx from 'clsx';
-import { LucideIcon, Facebook, Instagram, Mail, RefreshCw, Share2, Twitter } from 'lucide-react';
+import {
+  Facebook,
+  Instagram,
+  Mail,
+  RefreshCw,
+  Share2,
+  Twitter,
+  type LucideIcon
+} from 'lucide-react';
+
 import type { Provider } from '@/services/accountService';
 
 const providerConfig: Record<
@@ -43,10 +53,10 @@ const formatSyncedAt = (value?: string | null) => {
   if (!value) return 'Never synced';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Pending sync';
-  return `Last synced ${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${date.toLocaleTimeString(
-    undefined,
-    { hour: '2-digit', minute: '2-digit' }
-  )}`;
+  return `Last synced ${date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric'
+  })} · ${date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
 };
 
 export interface ProviderCardProps {
@@ -128,7 +138,9 @@ export const ProviderCard = ({
               type="button"
               onClick={onDisconnect}
               disabled={isDisconnecting}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-surface disabled:opacity-60"
+              className={clsx(
+                'bg-surface-muted disabled:opacity-60 flex-1 font-semibold gap-2 hover:bg-surface inline-flex items-center justify-center px-3 py-2 rounded-xl text-muted-foreground text-sm transition'
+              )}
             >
               {isDisconnecting ? 'Disconnecting' : 'Disconnect'}
             </button>
@@ -139,4 +151,4 @@ export const ProviderCard = ({
   );
 };
 
-
+/* eslint-enable tailwindcss/classnames-order */

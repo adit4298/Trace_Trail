@@ -9,7 +9,6 @@ import {
   Fingerprint,
   Gauge,
   LayoutDashboard,
-  LucideIcon,
   Radar,
   ScanSearch,
   Settings,
@@ -22,7 +21,9 @@ import { usePathname } from 'next/navigation';
 
 import { Badge } from '@/components/ui/Badge';
 import { Tooltip } from '@/components/ui/Tooltip';
+
 import type { IconName, NavItem } from '@/lib/types';
+import type { LucideIcon } from 'lucide-react';
 
 const iconMap: Partial<Record<IconName, LucideIcon>> = {
   overview: Gauge,
@@ -112,7 +113,7 @@ export const NavSidebar = ({
                         >
                           <span
                             className={clsx(
-                              'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl border border-border/60 text-primary transition-transform group-hover/nav:scale-[1.04]',
+                              'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/60 text-primary transition-transform group-hover/nav:scale-[1.04]',
                               isActive && 'border-primary/60 bg-primary/10 text-primary'
                             )}
                           >

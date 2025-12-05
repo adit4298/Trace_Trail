@@ -1,8 +1,11 @@
+/* eslint-disable tailwindcss/classnames-order */
 'use client';
 
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect } from 'react';
+
+import type { ReactNode } from 'react';
 
 type ModalVariant = 'center' | 'right';
 
@@ -55,12 +58,14 @@ export const Modal = ({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
+      {/* eslint-disable-next-line tailwindcss/classnames-order */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label={resolvedLabel}
         className={clsx(
-          'relative z-10 flex h-full max-h-[95vh] w-full flex-col overflow-hidden border border-border/60 bg-surface text-foreground shadow-[0_25px_60px_rgba(4,6,9,0.45)]',
+          /* eslint-disable-next-line tailwindcss/classnames-order */
+          'relative z-10 flex flex-col h-full w-full max-h-[95vh] overflow-hidden border border-border/60 bg-surface text-foreground shadow-[0_25px_60px_rgba(4,6,9,0.45)]',
           variant === 'center'
             ? 'm-auto max-w-2xl rounded-[28px] animate-modal-in'
             : 'ml-auto w-full max-w-md rounded-l-[28px] animate-drawer-in',
@@ -90,4 +95,4 @@ export const Modal = ({
   );
 };
 
-
+/* eslint-enable tailwindcss/classnames-order */

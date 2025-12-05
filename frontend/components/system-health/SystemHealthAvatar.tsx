@@ -3,8 +3,8 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { HealthModal, type HealthBreakdown } from './HealthModal';
 import { HealthCore } from './HealthCore';
+import { HealthModal, type HealthBreakdown } from './HealthModal';
 import { HealthStateRing } from './HealthStateRing';
 import { HealthTooltip } from './HealthTooltip';
 import { useHealthStatus } from './useHealthStatus';
@@ -47,15 +47,12 @@ export const SystemHealthAvatar = ({
   return (
     <>
       <div
-        className={clsx(
-          'pointer-events-none fixed z-40 transition-transform duration-300',
-          positionClasses[position]
-        )}
+        className={clsx('pointer-events-none fixed z-40 transition-transform duration-300', positionClasses[position])}
       >
         <button
           type="button"
           className={clsx(
-            'relative pointer-events-auto flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-3 text-xs text-foreground shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1',
+            'pointer-events-auto relative flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-3 text-xs text-foreground shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1',
             status.glow
           )}
           onMouseEnter={() => setHovered(true)}

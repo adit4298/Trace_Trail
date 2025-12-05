@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useTheme } from '@/hooks/useTheme';
+
 import type { UserProfile } from '@/lib/types';
 
 interface TopNavbarProps {

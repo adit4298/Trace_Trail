@@ -2,10 +2,11 @@
 
 import clsx from 'clsx';
 import { formatDistanceToNow } from 'date-fns';
-import type { ComponentProps } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
+
 import type { Activity } from '@/lib/types';
+import type { ComponentProps } from 'react';
 
 const severityMap: Record<
   Activity['state'],

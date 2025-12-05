@@ -1,17 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  TooltipProps,
-  XAxis,
-  YAxis
-} from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import type { TrendSeries } from '@/lib/types';
+import type { TooltipProps } from 'recharts';
 
 interface TrendCardProps {
   series: TrendSeries;

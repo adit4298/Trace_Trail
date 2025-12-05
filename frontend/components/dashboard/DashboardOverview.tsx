@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from 'react';
 
-import { ActivityDetailDrawer } from '@/components/live-activity/ActivityDetailDrawer';
-import { LiveActivityList } from '@/components/live-activity/LiveActivityList';
 import { MetricCard } from '@/components/cards/MetricCard';
 import { MetricDetailPanel } from '@/components/cards/MetricDetailPanel';
-import { SystemHealthAvatar } from '@/components/system-health/SystemHealthAvatar';
 import { TrendChart } from '@/components/charts/TrendChart';
+import { ActivityDetailDrawer } from '@/components/live-activity/ActivityDetailDrawer';
+import { LiveActivityList } from '@/components/live-activity/LiveActivityList';
+import { SystemHealthAvatar } from '@/components/system-health/SystemHealthAvatar';
+
 import type { Activity, DashboardSnapshot, MetricSummary, TrendSeries } from '@/lib/types';
 
 type RangeOption = '24h' | '7d' | '14d' | '30d';

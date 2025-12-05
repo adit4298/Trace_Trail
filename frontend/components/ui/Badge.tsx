@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+
 import type { ReactNode } from 'react';
 
 type BadgeVariant = 'neutral' | 'info' | 'success' | 'warning' | 'critical';
@@ -21,7 +22,7 @@ const variantStyles: Record<BadgeVariant, string> = {
 export const Badge = ({ variant = 'neutral', children, className, soft = false }: BadgeProps) => (
   <span
     className={clsx(
-      'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase',
+      'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
       soft ? 'backdrop-blur' : '',
       variantStyles[variant],
       className

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+
 import type { Activity } from '@/lib/types';
 
 interface ActivityDetailDrawerProps {

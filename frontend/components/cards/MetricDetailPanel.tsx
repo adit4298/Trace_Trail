@@ -11,6 +11,7 @@ import {
 
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+
 import type { MetricSummary } from '@/lib/types';
 
 const detailRoutes: Record<string, string> = {

@@ -1,20 +1,21 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { ProviderCard } from '@/components/accounts/ProviderCard';
 import {
-  AccountConnection,
   PROVIDERS,
-  Provider,
   disconnectAccount,
   getAccounts,
   getOAuthRedirectUrl,
   syncAll,
-  syncProvider
+  syncProvider,
+  type AccountConnection,
+  type Provider
 } from '@/services/accountService';
+
+import { ProviderCard } from './ProviderCard';
 
 const providerLabels: Record<Provider, string> = {
   google: 'Google',
@@ -60,7 +61,7 @@ export const ConnectedAccounts = () => {
   }, []);
 
   useEffect(() => {
-    loadAccounts();
+    void loadAccounts();
   }, [loadAccounts]);
 
   const setProviderAction = (provider: Provider, action: 'connect' | 'disconnect' | 'sync' | null) => {

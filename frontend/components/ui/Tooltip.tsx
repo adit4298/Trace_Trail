@@ -1,7 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+
+import type { ReactNode } from 'react';
 
 type TooltipSide = 'top' | 'bottom' | 'left' | 'right';
 type TooltipAlign = 'start' | 'center' | 'end';
@@ -80,7 +82,7 @@ export const Tooltip = ({
         id={tooltipId}
         className={clsx(
           'pointer-events-none whitespace-nowrap rounded-xl border border-white/10 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 shadow-[0_20px_45px_rgba(15,23,42,0.45)] backdrop-blur-xl transition-all duration-150',
-          'opacity-0 translate-y-1 will-change-transform data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0',
+          'translate-y-1 opacity-0 will-change-transform data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100',
           getPositionClasses(side, align)
         )}
         data-visible={visible}

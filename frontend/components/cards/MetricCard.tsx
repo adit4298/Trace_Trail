@@ -16,6 +16,7 @@ import { memo, useMemo } from 'react';
 
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useCountUp } from '@/hooks/useCountUp';
+
 import type { MetricSummary } from '@/lib/types';
 
 interface MetricCardProps {
