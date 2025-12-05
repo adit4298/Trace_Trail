@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine, event
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 from .config import settings
 import logging
+from src.app.db.base import Base
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +23,6 @@ SessionLocal = sessionmaker(
     autoflush=False,
     bind=engine
 )
-
-# Base class for all models
-Base = declarative_base()
 
 # Event listeners for connection management
 @event.listens_for(engine, "connect")

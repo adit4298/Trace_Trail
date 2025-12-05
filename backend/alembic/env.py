@@ -9,7 +9,8 @@ import sys
 # Add the project root to the path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.core.database import Base
+from src.app.db.base import Base
+from src.app import models  # noqa: F401
 from src.core.config import settings
 
 # This is the Alembic Config object

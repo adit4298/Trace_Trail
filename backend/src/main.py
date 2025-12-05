@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from src.core.app import create_app
+from src.app.core.app import create_app
 
 app: FastAPI = create_app()
 
