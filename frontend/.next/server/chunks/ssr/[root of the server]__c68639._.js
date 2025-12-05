@@ -460,7 +460,8 @@ const mockDashboardSnapshot = {
 "use strict";
 
 __turbopack_esm__({
-    "default": ()=>SectionPage
+    "default": ()=>SectionPage,
+    "generateStaticParams": ()=>generateStaticParams
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$api$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_import__("[project]/node_modules/next/dist/api/navigation.react-server.js [app-rsc] (ecmascript) <module evaluation>");
@@ -473,6 +474,102 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2e$ts__$5b$app$2d
 ;
 ;
 const SECTION_CONTENT = {
+    signals: {
+        title: 'Signals',
+        description: 'Friendly pulse on the events TraceTrail monitored for you today. Use this view to understand volume, accuracy, and freshness.',
+        highlights: [
+            {
+                id: 'volume',
+                label: 'Signals processed',
+                value: '142k',
+                delta: '+12.4%',
+                tone: 'positive',
+                detail: 'vs yesterday'
+            },
+            {
+                id: 'precision',
+                label: 'Precision',
+                value: '98.2%',
+                delta: '+1.3%',
+                tone: 'positive',
+                detail: 'Model confidence'
+            },
+            {
+                id: 'latency',
+                label: 'Avg. latency',
+                value: '420 ms',
+                delta: '-75 ms',
+                tone: 'positive',
+                detail: 'End-to-end'
+            }
+        ],
+        insights: [
+            {
+                title: 'Morning sync',
+                description: 'All regions synced on schedule. APAC produced 38% of today’s insights thanks to holiday shopping traffic.'
+            },
+            {
+                title: 'Auto-labeling',
+                description: 'Signal Copilot re-labeled 1.2k benign anomalies. You can lighten analyst load by enabling digest mode.'
+            },
+            {
+                title: 'Data freshness',
+                description: 'Two partner feeds briefly lagged by ~3 minutes. System caught up automatically, but we flagged for visibility.'
+            }
+        ],
+        checklist: [
+            'Share signal highlights with teammates via the daily digest.',
+            'Skim the “new sources” tab to approve incoming feeds.',
+            'Review auto-labeling suggestions before the weekend.'
+        ]
+    },
+    investigations: {
+        title: 'Investigations',
+        description: 'Simple overview of open cases and recent escalations so you can keep tabs on what needs human attention.',
+        highlights: [
+            {
+                id: 'open',
+                label: 'Open investigations',
+                value: '37',
+                delta: '-5 vs yesterday',
+                tone: 'positive'
+            },
+            {
+                id: 'sla',
+                label: 'SLA at risk',
+                value: '3',
+                delta: '+1 case',
+                tone: 'negative',
+                detail: 'Requires a quick review'
+            },
+            {
+                id: 'auto',
+                label: 'Auto-resolved (24h)',
+                value: '112',
+                delta: '+22%',
+                tone: 'positive'
+            }
+        ],
+        insights: [
+            {
+                title: 'Escalations',
+                description: 'Phoenix Monitor nudged three “High Risk” login clusters to Tier 2. They are waiting in your queue.'
+            },
+            {
+                title: 'People bandwidth',
+                description: 'Average investigator queue time is 18 minutes—well within the comfortable range this week.'
+            },
+            {
+                title: 'Recommendations',
+                description: 'Consider pairing new analysts with automation traces so they learn why certain cases close themselves.'
+            }
+        ],
+        checklist: [
+            'Double-check the few items with SLA warnings.',
+            'Document any manual overrides you applied today.',
+            'Celebrate the auto-resolved wins with your team!'
+        ]
+    },
     insights: {
         title: 'Strategic Insights',
         description: 'Quantitative breakdown of signal quality, data freshness, and anomaly velocity. Use this space to explain why the dashboard is trending up or down.',
@@ -757,6 +854,11 @@ const toneStyles = {
     negative: 'text-danger bg-danger/15',
     neutral: 'text-muted bg-surface/60'
 };
+function generateStaticParams() {
+    return Object.keys(SECTION_CONTENT).map((section)=>({
+            section
+        }));
+}
 async function SectionPage({ params }) {
     const sectionKey = params.section?.toLowerCase();
     const config = SECTION_CONTENT[sectionKey];
@@ -778,7 +880,7 @@ async function SectionPage({ params }) {
                         children: "Workspace"
                     }, void 0, false, {
                         fileName: "[project]/app/[section]/page.tsx",
-                        lineNumber: 236,
+                        lineNumber: 298,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -791,7 +893,7 @@ async function SectionPage({ params }) {
                                         children: config.title
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 239,
+                                        lineNumber: 301,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -799,13 +901,13 @@ async function SectionPage({ params }) {
                                         children: config.description
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 240,
+                                        lineNumber: 302,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 238,
+                                lineNumber: 300,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -813,19 +915,19 @@ async function SectionPage({ params }) {
                                 children: "Auto-updated every 15 minutes"
                             }, void 0, false, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 242,
+                                lineNumber: 304,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/[section]/page.tsx",
-                        lineNumber: 237,
+                        lineNumber: 299,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/[section]/page.tsx",
-                lineNumber: 235,
+                lineNumber: 297,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -842,7 +944,7 @@ async function SectionPage({ params }) {
                                         children: highlight.label
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 255,
+                                        lineNumber: 317,
                                         columnNumber: 15
                                     }, this),
                                     highlight.delta ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -850,13 +952,13 @@ async function SectionPage({ params }) {
                                         children: highlight.delta
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 257,
+                                        lineNumber: 319,
                                         columnNumber: 17
                                     }, this) : null
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 254,
+                                lineNumber: 316,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -864,7 +966,7 @@ async function SectionPage({ params }) {
                                 children: highlight.value
                             }, void 0, false, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 262,
+                                lineNumber: 324,
                                 columnNumber: 13
                             }, this),
                             highlight.detail ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -872,18 +974,18 @@ async function SectionPage({ params }) {
                                 children: highlight.detail
                             }, void 0, false, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 263,
+                                lineNumber: 325,
                                 columnNumber: 33
                             }, this) : null
                         ]
                     }, highlight.id, true, {
                         fileName: "[project]/app/[section]/page.tsx",
-                        lineNumber: 250,
+                        lineNumber: 312,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/[section]/page.tsx",
-                lineNumber: 248,
+                lineNumber: 310,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -902,7 +1004,7 @@ async function SectionPage({ params }) {
                                                 children: "Narrative"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 272,
+                                                lineNumber: 334,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -910,13 +1012,13 @@ async function SectionPage({ params }) {
                                                 children: "What to know"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 273,
+                                                lineNumber: 335,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 271,
+                                        lineNumber: 333,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -924,13 +1026,13 @@ async function SectionPage({ params }) {
                                         children: new Date().toLocaleDateString()
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 337,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 270,
+                                lineNumber: 332,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -943,7 +1045,7 @@ async function SectionPage({ params }) {
                                                 children: insight.title
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 280,
+                                                lineNumber: 342,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -951,24 +1053,24 @@ async function SectionPage({ params }) {
                                                 children: insight.description
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 281,
+                                                lineNumber: 343,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, insight.title, true, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 279,
+                                        lineNumber: 341,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 277,
+                                lineNumber: 339,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/[section]/page.tsx",
-                        lineNumber: 269,
+                        lineNumber: 331,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -982,7 +1084,7 @@ async function SectionPage({ params }) {
                                         children: "Next actions"
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 289,
+                                        lineNumber: 351,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -990,13 +1092,13 @@ async function SectionPage({ params }) {
                                         children: "Team checklist"
                                     }, void 0, false, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 290,
+                                        lineNumber: 352,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 288,
+                                lineNumber: 350,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1009,7 +1111,7 @@ async function SectionPage({ params }) {
                                                 children: index + 1
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 295,
+                                                lineNumber: 357,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1017,36 +1119,36 @@ async function SectionPage({ params }) {
                                                 children: item
                                             }, void 0, false, {
                                                 fileName: "[project]/app/[section]/page.tsx",
-                                                lineNumber: 298,
+                                                lineNumber: 360,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, item, true, {
                                         fileName: "[project]/app/[section]/page.tsx",
-                                        lineNumber: 294,
+                                        lineNumber: 356,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/[section]/page.tsx",
-                                lineNumber: 292,
+                                lineNumber: 354,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/[section]/page.tsx",
-                        lineNumber: 287,
+                        lineNumber: 349,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/[section]/page.tsx",
-                lineNumber: 268,
+                lineNumber: 330,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/[section]/page.tsx",
-        lineNumber: 234,
+        lineNumber: 296,
         columnNumber: 5
     }, this);
 }

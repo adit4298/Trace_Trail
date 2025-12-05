@@ -279,6 +279,10 @@ const toneStyles: Record<Tone, string> = {
   neutral: 'text-muted bg-surface/60'
 };
 
+export function generateStaticParams() {
+  return Object.keys(SECTION_CONTENT).map((section) => ({ section }));
+}
+
 export default async function SectionPage({ params }: { params: { section: string } }) {
   const sectionKey = params.section?.toLowerCase();
   const config = SECTION_CONTENT[sectionKey];
