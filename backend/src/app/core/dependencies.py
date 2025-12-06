@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Dict
 
-from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from .config import Settings, get_settings
@@ -27,11 +27,18 @@ def get_settings_dep() -> Settings:
     return get_settings()
 
 
-def get_oauth_registry(settings: Settings = Depends(get_settings_dep)) -> OAuthRegistry:
+def ensure_oauth_registry(settings: Settings | None = None) -> OAuthRegistry:
+    """Ensure the OAuth client registry exists (usable both in DI and startup hooks)."""
+
     global oauth_registry_cache
     if oauth_registry_cache is None:
-        oauth_registry_cache = build_oauth_registry(settings)
+        resolved_settings = settings or get_settings()
+        oauth_registry_cache = build_oauth_registry(resolved_settings)
     return oauth_registry_cache
+
+
+def get_oauth_registry(settings: Settings = Depends(get_settings_dep)) -> OAuthRegistry:
+    return ensure_oauth_registry(settings)
 
 
 def get_current_user(

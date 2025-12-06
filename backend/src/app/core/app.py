@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
 from .config import get_settings
-from .dependencies import get_oauth_registry
+from .dependencies import ensure_oauth_registry
 from ..routes import (
     accounts_routes,
     anomalies_routes,
@@ -55,7 +55,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup_event() -> None:  # pylint: disable=unused-variable
-        get_oauth_registry()  # Warm cache
+        ensure_oauth_registry(settings)  # Warm cache without Depends
         scheduler.start()
 
     @app.on_event("shutdown")
