@@ -22,32 +22,36 @@ spec:
         - name: frontend
           image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-frontend:latest
           imagePullPolicy: Always
-          # If you REALLY want envs from a ConfigMap, we can add it later.
-          # For now, NEXT_PUBLIC_API_URL is baked into the build via .env.production.
+
+          # NGINX serves on port 80 (NOT 3000)
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 80
+
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             periodSeconds: 5
+
           livenessProbe:
             httpGet:
               path: /
               port: http
             initialDelaySeconds: 30
             periodSeconds: 15
+
           resources:
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 128Mi
             limits:
               cpu: 300m
               memory: 512Mi
 
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -60,6 +64,6 @@ spec:
     app: frontend
   ports:
     - name: http
-      port: 80         # external port (LB)
-      targetPort: 3000 # Next.js container port
-  type: LoadBalancer
+      port: 80        # internal service port
+      targetPort: 80  # NGINX container port
+  type: ClusterIP     # IMPORTANT: we use Ingress + ALB, not LoadBalancer
