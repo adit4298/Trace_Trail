@@ -22,17 +22,15 @@ spec:
         - name: frontend
           image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-frontend:latest
           imagePullPolicy: Always
-
-          # NGINX serves on port 80 (NOT 3000)
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 3000
 
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 5
 
           livenessProbe:
@@ -45,7 +43,7 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: 300m
               memory: 512Mi
@@ -65,5 +63,5 @@ spec:
   ports:
     - name: http
       port: 80        # internal service port
-      targetPort: 80  # NGINX container port
+      targetPort: 3000  # Node container port
   type: ClusterIP     # IMPORTANT: we use Ingress + ALB, not LoadBalancer

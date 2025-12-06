@@ -1,8 +1,16 @@
 "use client";
 
-export type Provider = "google" | "instagram" | "facebook" | "twitter";
+export type Provider = 'google' | 'instagram' | 'facebook' | 'twitter';
 
 export interface AccountConnection {
+  provider: Provider;
+  connected: boolean;
+  username?: string;
+  email?: string;
+  lastSyncedAt?: string | null;
+}
+
+interface AccountDto {
   provider: Provider;
   connected: boolean;
   username?: string;
@@ -14,6 +22,8 @@ interface OAuthRedirectResponse {
   authorization_url?: string;
   url?: string;
 }
+
+export const PROVIDERS: Provider[] = ['google', 'instagram', 'facebook', 'twitter'];
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
@@ -52,7 +62,27 @@ const request = async <TResponse>(path: string, init: RequestInit = {}): Promise
   return asJson<TResponse>(response);
 };
 
-export const getAccounts = async (): Promise<AccountConnection[]> => request<AccountConnection[]>("/accounts");
+const normalizeAccount = (account: AccountDto): AccountConnection => ({
+  provider: account.provider,
+  connected: account.connected,
+  username: account.username,
+  email: account.email,
+  lastSyncedAt: account.last_synced_at ?? null,
+});
+
+export const getAccounts = async (): Promise<AccountConnection[]> => {
+  const response = await request<AccountDto[]>("/accounts");
+  const accountMap = new Map<Provider, AccountConnection>(response.map((account) => [account.provider, normalizeAccount(account)]));
+
+  return PROVIDERS.map(
+    (provider) =>
+      accountMap.get(provider) ?? {
+        provider,
+        connected: false,
+        lastSyncedAt: null,
+      }
+  );
+};
 
 export const getOAuthRedirectUrl = async (provider: Provider): Promise<string> => {
   const payload = await request<OAuthRedirectResponse>(`/auth/${provider}/redirect`);

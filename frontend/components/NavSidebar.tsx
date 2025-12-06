@@ -55,6 +55,7 @@ export const NavSidebar = ({
   variant = 'default'
 }: NavSidebarProps) => {
   const pathname = usePathname();
+  const safePathname = pathname ?? '';
   const primaryIds = new Set<IconName>(['overview', 'signals', 'investigations', 'activity', 'reports']);
   const primary = items.filter((item) => primaryIds.has(item.icon));
   const secondary = items.filter((item) => !primaryIds.has(item.icon));
@@ -95,8 +96,8 @@ export const NavSidebar = ({
                     {section.items.map((item) => {
                       const Icon = iconMap[item.icon] ?? Gauge;
                       const isActive =
-                        pathname === item.href ||
-                        (item.href !== '/' && pathname.startsWith(`${item.href}/`));
+                        safePathname === item.href ||
+                        (item.href !== '/' && safePathname.startsWith(`${item.href}/`));
 
                       const content = (
                         <Link
