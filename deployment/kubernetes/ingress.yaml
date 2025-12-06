@@ -9,12 +9,13 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/REPLACE-ME
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:661235013110:certificate/18104400-3dc8-40ab-b67a-7673127c0f5c
     alb.ingress.kubernetes.io/group.name: tracetrail
+
 spec:
   ingressClassName: alb
   rules:
-    - host: tracetrail.in
+    - host: app.tracetrail.in
       http:
         paths:
           - path: /
@@ -24,16 +25,7 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: www.tracetrail.in
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
+
     - host: api.tracetrail.in
       http:
         paths:
@@ -44,4 +36,3 @@ spec:
                 name: backend
                 port:
                   number: 8000
-
