@@ -1,1 +1,17 @@
-{}
+{
+  "/Connections": "pages/Connections.js",
+  "/Dashboard": "pages/Dashboard.js",
+  "/Insights": "pages/Insights.js",
+  "/Login": "pages/Login.js",
+  "/_app": "pages/_app.js",
+  "/Home": "pages/Home.js",
+  "/Challenges": "pages/Challenges.js",
+  "/Recommendations": "pages/Recommendations.js",
+  "/Profile": "pages/Profile.js",
+  "/Signup": "pages/Signup.js",
+  "/NotFound": "pages/NotFound.js",
+  "/Reports": "pages/Reports.js",
+  "/_error": "pages/_error.js",
+  "/Settings": "pages/Settings.js",
+  "/_document": "pages/_document.js"
+}

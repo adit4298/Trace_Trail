@@ -5,6 +5,8 @@ WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
+RUN apk add --no-cache libc6-compat
+
 COPY package*.json ./
 RUN npm ci
 
@@ -18,6 +20,8 @@ WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000
+
+RUN apk add --no-cache libc6-compat
 
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/next.config.mjs ./next.config.mjs

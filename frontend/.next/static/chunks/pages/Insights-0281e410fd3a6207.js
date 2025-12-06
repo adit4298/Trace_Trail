@@ -1,0 +1,1 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[979],{19569:function(n,_,u){(window.__NEXT_P=window.__NEXT_P||[]).push(["/Insights",function(){return u(80340)}])},80340:function(){}},function(n){n.O(0,[888,774,179],function(){return n(n.s=19569)}),_N_E=n.O()}]);
