@@ -101,6 +101,13 @@ class SystemHealthSchema(BaseModel):
         from_attributes = True
 
 
+class HealthStatusResponse(BaseModel):
+    status: str
+    timestamp: datetime
+    version: str
+    environment: str
+
+
 class SyncResponse(BaseModel):
     provider: str
     status: str
