@@ -24,7 +24,7 @@ def record_activity(
         user_id=user_id,
         action_type=action_type,
         message=message,
-        metadata=metadata or {},
+        log_metadata=metadata or {},
     )
     db.add(log)
     db.flush()

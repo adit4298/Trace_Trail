@@ -165,7 +165,7 @@ class SyncService:
                 title=activity.get("title", f"{provider.title()} activity"),
                 description=activity.get("description"),
                 severity=severity,
-                metadata=activity,
+                signal_metadata=activity,
             )
             self.db.add(signal)
             stored.append(signal)
@@ -177,9 +177,7 @@ class SyncService:
         now = datetime.now(timezone.utc)
         cutoff = now - timedelta(hours=12)
 
-        recent_high = [
-            s for s in signals if s.severity >= 4 or (s.metadata or {}).get("is_unusual")
-        ]
+        recent_high = [s for s in signals if s.severity >= 4 or (s.signal_metadata or {}).get("is_unusual")]
         for signal in recent_high:
             anomaly = Anomaly(
                 user_id=user_id,
@@ -188,16 +186,16 @@ class SyncService:
                 anomaly_type="high_severity_signal",
                 confidence_score=min(1.0, 0.6 + (signal.severity * 0.08)),
                 risk_level=signal.severity,
-                details={"reason": SEVERITY_LABELS.get(signal.severity, "medium"), "metadata": signal.metadata},
+                details={"reason": SEVERITY_LABELS.get(signal.severity, "medium"), "metadata": signal.signal_metadata},
             )
             self.db.add(anomaly)
             anomalies.append(anomaly)
 
         # Detect rapid repeated logins
-        rapid_logins = [s for s in signals if s.category == "login" and (s.metadata or {}).get("timestamp")]
+        rapid_logins = [s for s in signals if s.category == "login" and (s.signal_metadata or {}).get("timestamp")]
         recent_logins = []
         for signal in rapid_logins:
-            timestamp_str = (signal.metadata or {}).get("timestamp")
+            timestamp_str = (signal.signal_metadata or {}).get("timestamp")
             try:
                 timestamp = datetime.fromisoformat(timestamp_str)
                 if timestamp.tzinfo is None:

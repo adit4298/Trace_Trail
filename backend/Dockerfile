@@ -1,30 +1,22 @@
-FROM python:3.11-slim AS base
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    POETRY_VIRTUALENVS_CREATE=false
+    PYTHONUNBUFFERED=1
 
-# Work directory inside the container
 WORKDIR /app
 
-# System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files and install Python deps
-COPY requirements ./requirements
+COPY requirements/base.txt ./requirements/base.txt
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements/base.txt && \
-    pip install --no-cache-dir -r requirements/dev.txt
+    pip install --no-cache-dir -r requirements/base.txt
 
-# Copy backend source code
 COPY . .
 
 ENV PYTHONPATH=/app/
 
-# Backend listens on port 8000
 EXPOSE 8000
 
-# Start backend FastAPI application
 CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

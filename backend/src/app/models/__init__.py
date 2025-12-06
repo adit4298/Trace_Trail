@@ -155,7 +155,7 @@ class Signal(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
     severity: Mapped[int] = mapped_column(Integer, nullable=False)
-    metadata: Mapped[dict | None] = mapped_column(JSONB)
+    signal_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped[User] = relationship("User", back_populates="signals")
@@ -202,7 +202,7 @@ class ActivityLog(Base):
     )
     action_type: Mapped[str] = mapped_column(String(64), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[dict | None] = mapped_column(JSONB)
+    log_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped[User | None] = relationship("User", back_populates="activity_logs")
@@ -221,7 +221,7 @@ class AIInsight(Base):
     )
     insight_type: Mapped[str] = mapped_column(String(64), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[dict | None] = mapped_column(JSONB)
+    insight_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped[User] = relationship("User", back_populates="insights")

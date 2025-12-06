@@ -66,7 +66,12 @@ class InsightService:
             "health_score": health_score,
         }
 
-        insight = AIInsight(user_id=user_id, insight_type="risk_summary", content=content, metadata=metadata)
+        insight = AIInsight(
+            user_id=user_id,
+            insight_type="risk_summary",
+            content=content,
+            insight_metadata=metadata,
+        )
         self.db.add(insight)
         self.db.flush()
         return insight
