@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[41],{22240:function(n,u,_){(window.__NEXT_P=window.__NEXT_P||[]).push(["/NotFound",function(){return _(80297)}])},80297:function(){}},function(n){n.O(0,[888,774,179],function(){return n(n.s=22240)}),_N_E=n.O()}]);

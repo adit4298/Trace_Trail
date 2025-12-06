@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[337],{90820:function(n,_,u){(window.__NEXT_P=window.__NEXT_P||[]).push(["/Challenges",function(){return u(88446)}])},88446:function(){}},function(n){n.O(0,[888,774,179],function(){return n(n.s=90820)}),_N_E=n.O()}]);
