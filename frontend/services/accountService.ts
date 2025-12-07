@@ -27,13 +27,32 @@ export const PROVIDERS: Provider[] = ['google', 'instagram', 'facebook', 'twitte
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
-const buildApiUrl = (path: string): string => {
+const ensureApiBaseUrl = (): string => {
   if (!API_BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_URL must be configured for backend requests.");
   }
 
-  return `${API_BASE_URL}${path}`;
+  return API_BASE_URL;
 };
+
+const resolveBackendUrl = (endpoint: string): string => {
+  if (endpoint.startsWith("http")) {
+    return endpoint;
+  }
+
+  const baseUrl = ensureApiBaseUrl();
+  if (endpoint.startsWith("/")) {
+    return `${baseUrl}${endpoint}`;
+  }
+
+  return `${baseUrl}/${endpoint}`;
+};
+
+const accountsEndpoint = () => `${ensureApiBaseUrl()}/accounts`;
+const oauthRedirectEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/auth/${provider}/redirect`;
+const accountDisconnectEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/accounts/${provider}/disconnect`;
+const syncProviderEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/sync/${provider}`;
+const syncAllEndpoint = () => `${ensureApiBaseUrl()}/sync/all`;
 
 const asJson = async <T>(response: Response): Promise<T> => {
   if (response.status === 204) {
@@ -43,8 +62,8 @@ const asJson = async <T>(response: Response): Promise<T> => {
   return (await response.json()) as T;
 };
 
-const request = async <TResponse>(path: string, init: RequestInit = {}): Promise<TResponse> => {
-  const url = path.startsWith("http") ? path : buildApiUrl(path);
+const request = async <TResponse>(endpoint: string, init: RequestInit = {}): Promise<TResponse> => {
+  const url = resolveBackendUrl(endpoint);
 
   const response = await fetch(url, {
     credentials: "include",
@@ -64,7 +83,7 @@ const request = async <TResponse>(path: string, init: RequestInit = {}): Promise
       // ignore JSON parsing errors
     }
 
-    throw new Error(message || `Request to ${path} failed with status ${response.status}`);
+    throw new Error(message || `Request to ${endpoint} failed with status ${response.status}`);
   }
 
   return asJson<TResponse>(response);
@@ -79,7 +98,7 @@ const normalizeAccount = (account: AccountDto): AccountConnection => ({
 });
 
 export const getAccounts = async (): Promise<AccountConnection[]> => {
-  const response = await request<AccountDto[]>(buildApiUrl("/accounts"));
+  const response = await request<AccountDto[]>(accountsEndpoint());
   const accountMap = new Map<Provider, AccountConnection>(response.map((account) => [account.provider, normalizeAccount(account)]));
 
   return PROVIDERS.map(
@@ -93,15 +112,15 @@ export const getAccounts = async (): Promise<AccountConnection[]> => {
 };
 
 export const getOAuthRedirectUrl = async (provider: Provider): Promise<string> => {
-  const payload = await request<OAuthRedirectResponse>(buildApiUrl(`/auth/${provider}/redirect`));
+  const payload = await request<OAuthRedirectResponse>(oauthRedirectEndpoint(provider));
   return payload.authorization_url ?? payload.url ?? "";
 };
 
 export const disconnectAccount = (provider: Provider): Promise<void> =>
-  request(buildApiUrl(`/accounts/${provider}/disconnect`), { method: "POST" });
+  request(accountDisconnectEndpoint(provider), { method: "POST" });
 
 export const syncProvider = (provider: Provider): Promise<void> =>
-  request(buildApiUrl(`/sync/${provider}`), { method: "POST" });
+  request(syncProviderEndpoint(provider), { method: "POST" });
 
-export const syncAll = (): Promise<void> => request(buildApiUrl("/sync/all"), { method: "POST" });
+export const syncAll = (): Promise<void> => request(syncAllEndpoint(), { method: "POST" });
 

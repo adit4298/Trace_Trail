@@ -2,6 +2,27 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+const ensureApiBaseUrl = (): string => {
+  if (!API_BASE_URL) {
+    throw new Error('NEXT_PUBLIC_API_URL must be configured for backend requests.');
+  }
+
+  return API_BASE_URL;
+};
+
+const buildRequestUrl = (path: string): string => {
+  if (path.startsWith('http')) {
+    return path;
+  }
+
+  const baseUrl = ensureApiBaseUrl();
+  if (path.startsWith('/')) {
+    return `${baseUrl}${path}`;
+  }
+
+  return `${baseUrl}/${path}`;
+};
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface ApiOptions<TBody = unknown> {
@@ -16,7 +37,7 @@ async function apiRequest<TResponse = unknown, TBody = unknown>(
   path: string,
   options: ApiOptions<TBody> = {}
 ): Promise<TResponse> {
-  const url = `${API_BASE_URL ?? ''}${path}`;
+  const url = buildRequestUrl(path);
 
   const headers: Record<string, string> = {
     ...(options.isFormData ? {} : { 'Content-Type': 'application/json' }),
