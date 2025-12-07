@@ -1,6 +1,10 @@
 'use client';
 
-import { useCallback, useState, type ReactNode } from 'react';
+import clsx from 'clsx';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+
+import { Onboarding } from '@/components/onboarding/Onboarding';
+import { onboardingSteps } from '@/components/onboarding/onboardingSteps';
 
 import { AnimatedBackground } from './layout/AnimatedBackground';
 import { TopNavbar } from './layout/TopNavbar';
@@ -19,7 +23,21 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  const toggleNav = useCallback(() => setIsNavOpen((prev) => !prev), []);
   const closeNav = useCallback(() => setIsNavOpen(false), []);
+
+  useEffect(() => {
+    if (!isNavOpen) {
+      return;
+    }
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeNav();
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [isNavOpen, closeNav]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -33,7 +51,7 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
         />
 
         <div className="flex flex-1 flex-col bg-background/95">
-          <TopNavbar notifications={notifications} user={user} onOpenSidebar={() => setIsNavOpen(true)} />
+          <TopNavbar notifications={notifications} user={user} onToggleSidebar={toggleNav} />
 
           <main
             id="main-content"
@@ -45,34 +63,51 @@ export const AppShell = ({ navItems, notifications, user, children }: AppShellPr
         </div>
       </div>
 
-      {isNavOpen ? (
+      <div
+        className={clsx(
+          'fixed inset-0 z-40 transition-opacity duration-300',
+          isNavOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        )}
+        data-state={isNavOpen ? 'open' : 'closed'}
+        aria-hidden={!isNavOpen}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
+        <button
+          type="button"
+          className="absolute inset-0 z-0 h-full w-full cursor-pointer bg-transparent"
+          aria-label="Close navigation overlay"
+          onClick={closeNav}
+        />
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className={clsx(
+            'relative z-10 flex h-full w-72 -translate-x-full flex-col bg-[#14181f] shadow-2xl transition-transform duration-300 ease-out',
+            isNavOpen && 'translate-x-0'
+          )}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation drawer"
         >
-          <div className="absolute inset-y-0 left-0 flex h-full w-72 flex-col bg-[#14181f]">
-            <div className="flex items-center justify-between px-4 py-4 text-sm">
-              <p className="font-semibold uppercase tracking-[0.3em] text-muted">Navigate</p>
-              <button
-                type="button"
-                className="rounded-full border border-border/60 px-3 py-1 text-xs uppercase text-muted"
-                onClick={closeNav}
-              >
-                Close
-              </button>
-            </div>
-            <NavSidebar
-              items={navItems}
-              collapsed={false}
-              onToggleCollapse={() => undefined}
-              onNavigate={closeNav}
-              variant="overlay"
-            />
+          <div className="flex items-center justify-between px-4 py-4 text-sm">
+            <p className="font-semibold uppercase tracking-[0.3em] text-muted">Navigate</p>
+            <button
+              type="button"
+              className="rounded-full border border-border/60 px-3 py-1 text-xs uppercase text-muted transition hover:text-foreground"
+              onClick={closeNav}
+            >
+              Close
+            </button>
           </div>
+          <NavSidebar
+            items={navItems}
+            collapsed={false}
+            onToggleCollapse={() => undefined}
+            onNavigate={closeNav}
+            variant="overlay"
+          />
         </div>
-      ) : null}
+      </div>
+
+      <Onboarding steps={onboardingSteps} />
     </div>
   );
 };

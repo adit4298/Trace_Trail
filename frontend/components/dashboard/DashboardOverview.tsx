@@ -25,9 +25,89 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
   const riskMetric = snapshot.metrics.find((metric) => metric.id === 'risk-score');
   const healthScore = riskMetric ? parseFloat(riskMetric.value) : 42;
   const healthBreakdown = useHealthBreakdown(snapshot.metrics, snapshot.trends);
+  const quickActions = [
+    { id: 'link', label: 'Link Accounts', helper: 'Connect Google, Meta, X' },
+    { id: 'insights', label: 'View Insights', helper: 'Monitor anomalies' },
+    { id: 'signals', label: 'Check Signals', helper: 'See live events' }
+  ];
+  const accountStatus = [
+    { id: 'google', label: 'Google', detail: 'Identity telemetry', status: 'Synced' },
+    { id: 'instagram', label: 'Instagram', detail: 'Social footprint', status: 'Listening' },
+    { id: 'facebook', label: 'Facebook', detail: 'Network reach', status: 'Ready' },
+    { id: 'twitter', label: 'X / Twitter', detail: 'Signal feed', status: 'Queued' }
+  ];
 
   return (
     <div className="space-y-8">
+      <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft backdrop-blur" aria-label="Greeting">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-primary/80">Welcome back 👋</p>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">Your Security Companion</h1>
+            <p className="mt-2 text-base text-muted">
+              Keep your digital footprint safe with live telemetry, human-friendly insights, and always-on monitoring.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {quickActions.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                className="min-w-[160px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-foreground transition hover:border-white/30 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              >
+                <span className="block font-semibold">{action.label}</span>
+                <span className="text-xs text-muted">{action.helper}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="onboarding-accounts-section"
+        className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft"
+        aria-label="Accounts overview"
+      >
+        <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted/70">Accounts Overview</p>
+            <h2 className="text-xl font-semibold text-foreground">Manage and sync your connected platforms.</h2>
+            <p className="text-sm text-muted">Each linked account unlocks richer insights and better coverage.</p>
+          </div>
+          <span className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+            4 Providers
+          </span>
+        </header>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {accountStatus.map((account) => (
+            <div
+              key={account.id}
+              className="rounded-2xl border border-white/5 bg-white/5 px-4 py-4 text-sm text-foreground shadow-inner"
+            >
+              <div className="flex items-center justify-between">
+                <p className="font-semibold">{account.label}</p>
+                <span className="text-xs uppercase tracking-wide text-muted">{account.status}</span>
+              </div>
+              <p className="mt-1 text-xs text-muted">{account.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2" id="onboarding-account-benefits">
+          {['Insights intelligence', 'Telemetry coverage', 'Footprint tracking', 'Live signals'].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/5 bg-surface-muted/60 px-4 py-3 text-sm text-foreground"
+            >
+              <p className="font-semibold">{item}</p>
+              <p className="text-xs text-muted">Powered by your connected accounts.</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section aria-label="Key metrics" className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {snapshot.metrics.map((metric) => (
           <MetricCard
@@ -52,11 +132,15 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         onClose={() => setSelectedActivity(null)}
       />
 
-      <SystemHealthAvatar
-        score={healthScore}
-        updatedAt={new Date()}
-        breakdown={healthBreakdown}
-      />
+      <section id="onboarding-health-section">
+        <SystemHealthAvatar
+          score={healthScore}
+          updatedAt={new Date()}
+          breakdown={healthBreakdown}
+        />
+      </section>
+
+      <footer className="pt-2 text-center text-xs text-muted/80">© 2025 TraceTrail — Security Companion</footer>
     </div>
   );
 };

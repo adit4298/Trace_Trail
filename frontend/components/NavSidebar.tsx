@@ -60,6 +60,8 @@ export const NavSidebar = ({
   const primary = items.filter((item) => primaryIds.has(item.icon));
   const secondary = items.filter((item) => !primaryIds.has(item.icon));
 
+  const navId = variant === 'default' ? 'onboarding-navigation' : undefined;
+
   return (
     <aside
       className={clsx(
@@ -82,7 +84,7 @@ export const NavSidebar = ({
           ) : null}
         </div>
 
-        <nav className="flex-1 space-y-6">
+        <nav className="flex-1 space-y-6" id={navId}>
           {[{ label: 'Protection', items: primary }, { label: 'Workspace', items: secondary }].map(
             (section) =>
               section.items.length > 0 && (
@@ -101,6 +103,7 @@ export const NavSidebar = ({
 
                       const content = (
                         <Link
+                          id={variant === 'default' && item.icon === 'accounts' ? 'onboarding-accounts-link' : undefined}
                           key={item.id}
                           href={item.href}
                           onClick={onNavigate}

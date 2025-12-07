@@ -12,10 +12,10 @@ import type { UserProfile } from '@/lib/types';
 interface TopNavbarProps {
   notifications: number;
   user: UserProfile;
-  onOpenSidebar: () => void;
+  onToggleSidebar: () => void;
 }
 
-export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps) => {
+export const TopNavbar = ({ notifications, user, onToggleSidebar }: TopNavbarProps) => {
   const { theme, toggleTheme } = useTheme();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -35,9 +35,10 @@ export const TopNavbar = ({ notifications, user, onOpenSidebar }: TopNavbarProps
       <div className="flex items-center gap-3 px-4 py-4 lg:px-8">
         <button
           type="button"
-          className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface"
-          aria-label="Open navigation"
-          onClick={onOpenSidebar}
+          id="onboarding-hamburger"
+          className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-95"
+          aria-label="Toggle navigation menu"
+          onClick={onToggleSidebar}
         >
           <Menu className="h-5 w-5" />
         </button>
