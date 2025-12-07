@@ -42,6 +42,17 @@ export const Onboarding = ({ steps, storageKey = DEFAULT_STORAGE_KEY, onDismiss 
   }, [mounted, storageKey]);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !currentStep) {
+      return;
+    }
+
+    const onboardingEvent = new CustomEvent('tracetrail:onboarding-step', {
+      detail: { stepId: currentStep.id }
+    });
+    window.dispatchEvent(onboardingEvent);
+  }, [currentStep]);
+
+  useEffect(() => {
     const targetId = currentStep?.targetId;
     if (!isActive || !targetId) {
       setSpotlightRect(null);

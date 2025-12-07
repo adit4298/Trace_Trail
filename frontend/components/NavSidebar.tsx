@@ -41,18 +41,18 @@ const iconMap: Partial<Record<IconName, LucideIcon>> = {
 
 interface NavSidebarProps {
   items: NavItem[];
-  collapsed: boolean;
-  onToggleCollapse: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
   onNavigate?: () => void;
-  variant?: 'default' | 'overlay';
+  variant?: 'embedded' | 'drawer';
 }
 
 export const NavSidebar = ({
   items,
-  collapsed,
+  collapsed = false,
   onToggleCollapse,
   onNavigate,
-  variant = 'default'
+  variant = 'drawer'
 }: NavSidebarProps) => {
   const pathname = usePathname();
   const safePathname = pathname ?? '';
@@ -60,18 +60,22 @@ export const NavSidebar = ({
   const primary = items.filter((item) => primaryIds.has(item.icon));
   const secondary = items.filter((item) => !primaryIds.has(item.icon));
 
-  const navId = variant === 'default' ? 'onboarding-navigation' : undefined;
+  const navId = variant === 'drawer' ? 'onboarding-navigation' : undefined;
 
   return (
     <aside
       className={clsx(
-        'relative z-20 flex-col border-r border-border/40 bg-[#14181f] transition-all duration-300',
-        variant === 'default' ? 'hidden lg:flex' : 'flex',
-        collapsed ? 'w-[4.75rem]' : 'w-64'
+        'relative z-20 flex h-full flex-col',
+        variant === 'embedded'
+          ? clsx(
+              'border-r border-border/40 bg-[#14181f] transition-all duration-300',
+              collapsed ? 'w-[4.75rem]' : 'w-64'
+            )
+          : 'bg-transparent'
       )}
       aria-label="Primary navigation"
     >
-      <div className="flex flex-1 flex-col gap-6 px-3 py-6">
+      <div className="flex flex-1 flex-col gap-5 px-2 py-4">
         <div className={clsx('flex items-center gap-3 px-2', collapsed && 'justify-center')}>
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
             <Fingerprint className="h-5 w-5" />
@@ -84,13 +88,13 @@ export const NavSidebar = ({
           ) : null}
         </div>
 
-        <nav className="flex-1 space-y-6" id={navId}>
+        <nav className="flex-1 space-y-5 overflow-y-auto pr-1" id={navId}>
           {[{ label: 'Protection', items: primary }, { label: 'Workspace', items: secondary }].map(
             (section) =>
               section.items.length > 0 && (
                 <div key={section.label} className="space-y-2">
                   {!collapsed ? (
-                    <p className="px-2 text-xs font-semibold uppercase tracking-[0.3em] text-muted/70">
+                    <p className="px-2 text-xs font-semibold uppercase tracking-[0.35em] text-muted/70">
                       {section.label}
                     </p>
                   ) : null}
@@ -103,31 +107,31 @@ export const NavSidebar = ({
 
                       const content = (
                         <Link
-                          id={variant === 'default' && item.icon === 'accounts' ? 'onboarding-accounts-link' : undefined}
+                          id={variant === 'drawer' && item.icon === 'accounts' ? 'onboarding-accounts-link' : undefined}
                           key={item.id}
                           href={item.href}
                           onClick={onNavigate}
                           className={clsx(
-                            'group/nav relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                            'group/nav relative flex items-center gap-4 rounded-2xl px-4 py-3 text-[0.95rem] font-medium tracking-tight transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
                             isActive
-                              ? 'bg-surface text-foreground shadow-sm'
-                              : 'text-muted hover:bg-surface-muted/60 hover:text-foreground'
+                              ? 'bg-surface text-foreground shadow-lg shadow-black/20'
+                              : 'text-muted hover:bg-white/5 hover:text-foreground'
                           )}
                           aria-current={isActive ? 'page' : undefined}
                         >
                           <span
                             className={clsx(
-                              'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/60 text-primary transition-transform group-hover/nav:scale-[1.04]',
-                              isActive && 'border-primary/60 bg-primary/10 text-primary'
+                              'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-primary transition-transform duration-150 group-hover/nav:scale-105',
+                              isActive && 'border-primary/40 bg-primary/15 text-primary'
                             )}
                           >
-                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            <Icon className="h-5 w-5" aria-hidden="true" />
                           </span>
 
                           {!collapsed ? (
                             <span className="flex flex-1 items-center justify-between">
                               <span className="flex flex-col">
-                                <span>{item.label}</span>
+                                <span className="text-sm font-semibold text-foreground">{item.label}</span>
                                 <span className="text-xs text-muted">
                                   {isActive ? 'Active' : 'View insights'}
                                 </span>
@@ -141,7 +145,10 @@ export const NavSidebar = ({
                           ) : null}
 
                           {isActive ? (
-                            <span className="absolute inset-y-2 left-1 w-1 rounded-full bg-primary" aria-hidden="true" />
+                            <span
+                              className="absolute inset-y-3 left-1 w-1 rounded-full bg-primary"
+                              aria-hidden="true"
+                            />
                           ) : null}
                         </Link>
                       );
@@ -165,11 +172,11 @@ export const NavSidebar = ({
         </nav>
       </div>
 
-      {variant === 'default' ? (
+      {variant === 'embedded' ? (
         <div className="border-t border-border/40 px-3 py-4">
           <button
             type="button"
-            onClick={onToggleCollapse}
+            onClick={() => onToggleCollapse?.()}
             className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-surface-muted/60 py-2 text-xs font-semibold uppercase tracking-wide text-muted transition hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >

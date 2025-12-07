@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 import { Tooltip } from '@/components/ui/Tooltip';
+import { useSidebar } from '@/components/layout/SidebarContext';
 import { useTheme } from '@/hooks/useTheme';
 
 import type { UserProfile } from '@/lib/types';
@@ -12,10 +13,10 @@ import type { UserProfile } from '@/lib/types';
 interface TopNavbarProps {
   notifications: number;
   user: UserProfile;
-  onToggleSidebar: () => void;
 }
 
-export const TopNavbar = ({ notifications, user, onToggleSidebar }: TopNavbarProps) => {
+export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
+  const { toggleSidebar, isOpen: isSidebarOpen } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -36,9 +37,10 @@ export const TopNavbar = ({ notifications, user, onToggleSidebar }: TopNavbarPro
         <button
           type="button"
           id="onboarding-hamburger"
-          className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-95"
+          className="rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition-transform duration-150 hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-95"
           aria-label="Toggle navigation menu"
-          onClick={onToggleSidebar}
+          aria-expanded={isSidebarOpen}
+          onClick={toggleSidebar}
         >
           <Menu className="h-5 w-5" />
         </button>
