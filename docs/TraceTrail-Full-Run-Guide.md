@@ -162,8 +162,7 @@ npm install
 
 Ensure the backend URL is configured. For local dev:
 
-- Either set `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000` in a `.env.local` file.
-- Or rely on any default in the code if provided.
+- Set `NEXT_PUBLIC_API_URL=http://localhost:8000` in a `.env.local` file.
 
 Start the dev server:
 

@@ -25,7 +25,15 @@ interface OAuthRedirectResponse {
 
 export const PROVIDERS: Provider[] = ['google', 'instagram', 'facebook', 'twitter'];
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+const buildApiUrl = (path: string): string => {
+  if (!API_BASE_URL) {
+    throw new Error("NEXT_PUBLIC_API_URL must be configured for backend requests.");
+  }
+
+  return `${API_BASE_URL}${path}`;
+};
 
 const asJson = async <T>(response: Response): Promise<T> => {
   if (response.status === 204) {
@@ -36,7 +44,7 @@ const asJson = async <T>(response: Response): Promise<T> => {
 };
 
 const request = async <TResponse>(path: string, init: RequestInit = {}): Promise<TResponse> => {
-  const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+  const url = path.startsWith("http") ? path : buildApiUrl(path);
 
   const response = await fetch(url, {
     credentials: "include",
@@ -71,7 +79,7 @@ const normalizeAccount = (account: AccountDto): AccountConnection => ({
 });
 
 export const getAccounts = async (): Promise<AccountConnection[]> => {
-  const response = await request<AccountDto[]>("/accounts");
+  const response = await request<AccountDto[]>(buildApiUrl("/accounts"));
   const accountMap = new Map<Provider, AccountConnection>(response.map((account) => [account.provider, normalizeAccount(account)]));
 
   return PROVIDERS.map(
@@ -85,15 +93,15 @@ export const getAccounts = async (): Promise<AccountConnection[]> => {
 };
 
 export const getOAuthRedirectUrl = async (provider: Provider): Promise<string> => {
-  const payload = await request<OAuthRedirectResponse>(`/auth/${provider}/redirect`);
+  const payload = await request<OAuthRedirectResponse>(buildApiUrl(`/auth/${provider}/redirect`));
   return payload.authorization_url ?? payload.url ?? "";
 };
 
 export const disconnectAccount = (provider: Provider): Promise<void> =>
-  request(`/accounts/${provider}/disconnect`, { method: "POST" });
+  request(buildApiUrl(`/accounts/${provider}/disconnect`), { method: "POST" });
 
 export const syncProvider = (provider: Provider): Promise<void> =>
-  request(`/sync/${provider}`, { method: "POST" });
+  request(buildApiUrl(`/sync/${provider}`), { method: "POST" });
 
-export const syncAll = (): Promise<void> => request("/sync/all", { method: "POST" });
+export const syncAll = (): Promise<void> => request(buildApiUrl("/sync/all"), { method: "POST" });
 

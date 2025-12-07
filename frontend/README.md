@@ -29,7 +29,7 @@ npm install
 
 ## Environment
 
-- `NEXT_PUBLIC_API_BASE_URL` (optional) points to the backend API for live data. When omitted the UI falls back to safe mock data.
+- `NEXT_PUBLIC_API_URL` points to the backend API for live data.
 - `PLAYWRIGHT_TEST_BASE_URL` overrides the default `http://127.0.0.1:3000` target for e2e runs.
 
 ## Deploy

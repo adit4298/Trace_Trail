@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { DashboardSnapshot } from '@/lib/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type FetchOptions = RequestInit & {
   cache?: RequestCache;
@@ -42,8 +42,10 @@ export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
     return mockDashboardSnapshot;
   }
 
+  const dashboardSummaryUrl = `${API_BASE_URL}/dashboard/summary`;
+
   try {
-    return await fetchJson<DashboardSnapshot>('/dashboard/summary', {
+    return await fetchJson<DashboardSnapshot>(dashboardSummaryUrl, {
       cache: 'force-cache',
       revalidate: 60,
       tags: ['dashboard']
@@ -60,7 +62,7 @@ function resolveUrl(endpoint: string): string {
   }
 
   if (!API_BASE_URL) {
-    throw new Error('Set NEXT_PUBLIC_API_BASE_URL to call relative endpoints.');
+    throw new Error('Set NEXT_PUBLIC_API_URL to call backend endpoints.');
   }
 
   return `${API_BASE_URL}${endpoint}`;
