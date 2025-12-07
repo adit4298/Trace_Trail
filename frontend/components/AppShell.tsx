@@ -6,8 +6,8 @@ import { Onboarding } from '@/components/onboarding/Onboarding';
 import { onboardingSteps } from '@/components/onboarding/onboardingSteps';
 
 import { AnimatedBackground } from './layout/AnimatedBackground';
-import { SidebarDrawer } from './layout/SidebarDrawer';
 import { SidebarProvider } from './layout/SidebarContext';
+import { SidebarDrawer } from './layout/SidebarDrawer';
 import { TopNavbar } from './layout/TopNavbar';
 
 import type { NavItem, UserProfile } from '@/lib/types';

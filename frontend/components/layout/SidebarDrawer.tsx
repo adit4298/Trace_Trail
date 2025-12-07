@@ -3,8 +3,8 @@
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 
-import { NavSidebar } from '@/components/NavSidebar';
 import { useSidebar } from '@/components/layout/SidebarContext';
+import { NavSidebar } from '@/components/NavSidebar';
 
 import type { NavItem } from '@/lib/types';
 
@@ -17,16 +17,18 @@ export const SidebarDrawer = ({ items }: SidebarDrawerProps) => {
 
   return (
     <>
-      <div
+      <button
+        type="button"
         className={clsx(
           'pointer-events-none fixed inset-0 z-40 opacity-0 transition-opacity duration-200',
           isOpen && 'pointer-events-auto opacity-100'
         )}
         aria-hidden={!isOpen}
         onClick={closeSidebar}
+        aria-label="Close sidebar overlay"
       >
         <div className="absolute inset-0 bg-black/40 backdrop-blur-md transition-opacity duration-200" />
-      </div>
+      </button>
 
       <aside
         className={clsx(

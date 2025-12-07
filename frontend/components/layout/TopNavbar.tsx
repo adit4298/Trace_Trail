@@ -4,8 +4,8 @@ import { Bell, Command, Menu, Moon, Search, Sun } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
-import { Tooltip } from '@/components/ui/Tooltip';
 import { useSidebar } from '@/components/layout/SidebarContext';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useTheme } from '@/hooks/useTheme';
 
 import type { UserProfile } from '@/lib/types';

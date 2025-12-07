@@ -105,6 +105,45 @@ export const Onboarding = ({ steps, storageKey = DEFAULT_STORAGE_KEY, onDismiss 
 
   const progress = useMemo(() => ((currentIndex + 1) / steps.length) * 100, [currentIndex, steps.length]);
 
+  const hasTarget = Boolean(currentStep?.targetId && spotlightRect);
+  const modalPosition = useMemo(() => {
+    if (!hasTarget || !spotlightRect) {
+      return { isAbsolute: false, top: undefined, left: undefined };
+    }
+
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+    const modalWidth = Math.min(768, viewportWidth - 32);
+    const modalHeight = 280;
+    const spacing = 24;
+
+    const targetCenterX = spotlightRect.left + spotlightRect.width / 2;
+    const targetCenterY = spotlightRect.top + spotlightRect.height / 2;
+    const targetBottom = spotlightRect.bottom;
+    const targetTop = spotlightRect.top;
+
+    let top: number | undefined;
+    let left: number | undefined;
+
+    if (targetBottom + spacing + modalHeight < viewportHeight) {
+      top = targetBottom + spacing;
+      left = Math.max(16, Math.min(targetCenterX - modalWidth / 2, viewportWidth - modalWidth - 16));
+    } else if (targetTop - spacing - modalHeight > 0) {
+      top = targetTop - spacing - modalHeight;
+      left = Math.max(16, Math.min(targetCenterX - modalWidth / 2, viewportWidth - modalWidth - 16));
+    } else {
+      top = Math.max(16, Math.min(targetCenterY - modalHeight / 2, viewportHeight - modalHeight - 16));
+      if (targetCenterX + modalWidth / 2 + spacing < viewportWidth) {
+        left = targetCenterX + spotlightRect.width / 2 + spacing;
+      } else {
+        left = spotlightRect.left - modalWidth - spacing;
+      }
+      left = Math.max(16, Math.min(left, viewportWidth - modalWidth - 16));
+    }
+
+    return { isAbsolute: true, top, left };
+  }, [hasTarget, spotlightRect]);
+
   useEffect(() => {
     if (!isActive) return;
     setAnimating(true);
@@ -118,14 +157,26 @@ export const Onboarding = ({ steps, storageKey = DEFAULT_STORAGE_KEY, onDismiss 
 
   return createPortal(
     <div className="fixed inset-0 z-[200]">
-      {currentStep?.targetId && spotlightRect ? null : (
+      {hasTarget ? null : (
         <div className="fixed inset-0 bg-[#05070d]/70 backdrop-blur-[2px] transition-opacity duration-300" />
       )}
       <div className="fixed inset-0 z-[199]" aria-hidden="true" />
 
-      <OnboardingHighlight rect={spotlightRect} visible={Boolean(currentStep?.targetId && spotlightRect)} />
+      <OnboardingHighlight rect={spotlightRect} visible={hasTarget} />
 
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[205] flex justify-center px-4 pb-6">
+      <div
+        className={clsx(
+          'pointer-events-none z-[205] flex px-4',
+          hasTarget && modalPosition.isAbsolute
+            ? 'absolute'
+            : 'fixed inset-x-0 bottom-0 justify-center pb-6'
+        )}
+        style={
+          hasTarget && modalPosition.isAbsolute && modalPosition.top !== undefined && modalPosition.left !== undefined
+            ? { top: `${modalPosition.top}px`, left: `${modalPosition.left}px` }
+            : undefined
+        }
+      >
         <div
           key={currentStep.id}
           className={clsx(
