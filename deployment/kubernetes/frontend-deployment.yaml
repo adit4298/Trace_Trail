@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-frontend:v2
+          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-frontend:v3
           imagePullPolicy: Always
           ports:
             - name: http
