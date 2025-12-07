@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-backend:latest
+          image: 661235013110.dkr.ecr.ap-southeast-2.amazonaws.com/tracetrail-backend:v2
           imagePullPolicy: Always
           ports:
             - name: http
