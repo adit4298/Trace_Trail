@@ -62,8 +62,11 @@ class Settings(BaseSettings):
 
     # HTTP / middleware
     CORS_ORIGINS: Sequence[str] | str = (
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://app.tracetrail.in",
     )
 
     TRUSTED_HOSTS: Sequence[str] = ("*",)
