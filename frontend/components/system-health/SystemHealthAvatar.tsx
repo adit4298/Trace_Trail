@@ -47,7 +47,11 @@ export const SystemHealthAvatar = ({
   return (
     <>
       <div
-        className={clsx('pointer-events-none fixed z-40 transition-transform duration-300', positionClasses[position])}
+        className={clsx(
+          'pointer-events-none fixed z-40 transition-transform duration-300',
+          positionClasses[position],
+          'max-lg:hidden' // Hide on mobile/tablet to prevent layout issues
+        )}
       >
         <button
           type="button"

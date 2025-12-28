@@ -49,12 +49,14 @@ export const ConnectedAccounts = () => {
 
   const loadAccounts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getAccounts();
       setAccounts(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load accounts');
+    } catch {
+      // Don't show error on initial load - just use default disconnected state
+      // Only show error for user-initiated actions
+      setAccounts(initialState);
     } finally {
       setLoading(false);
     }
@@ -71,11 +73,18 @@ export const ConnectedAccounts = () => {
   const handleConnect = async (provider: Provider) => {
     try {
       setProviderAction(provider, 'connect');
+      setError(null);
       const url = await getOAuthRedirectUrl(provider);
+      if (!url || url.trim() === '') {
+        throw new Error('OAuth integration not available. Please configure OAuth credentials in the backend.');
+      }
       window.location.href = url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to initiate OAuth flow');
+      const errorMessage = err instanceof Error ? err.message : 'Unable to initiate OAuth flow';
+      setError(errorMessage);
       setProviderAction(provider, null);
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     }
   };
 

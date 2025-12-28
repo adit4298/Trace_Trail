@@ -2,6 +2,7 @@
 
 import { Bell, Command, Menu, Moon, Search, Sun } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { useSidebar } from '@/components/layout/SidebarContext';
@@ -18,6 +19,7 @@ interface TopNavbarProps {
 export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
   const { toggleSidebar, isOpen: isSidebarOpen } = useSidebar();
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -131,18 +133,31 @@ export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
                 <button
                   type="button"
                   className="w-full rounded-xl px-3 py-2 text-left text-foreground transition hover:bg-surface-muted"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    router.push('/settings');
+                  }}
                 >
-                  View profile
+                  Settings
                 </button>
                 <button
                   type="button"
                   className="w-full rounded-xl px-3 py-2 text-left text-foreground transition hover:bg-surface-muted"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    router.push('/settings/preferences');
+                  }}
                 >
                   Preferences
                 </button>
                 <button
                   type="button"
                   className="mt-2 w-full rounded-xl bg-primary/20 px-3 py-2 text-left font-semibold text-foreground transition hover:bg-primary/30"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    // Sign out logic would go here
+                    // TODO: Implement sign out functionality
+                  }}
                 >
                   Sign out
                 </button>

@@ -65,28 +65,36 @@ const asJson = async <T>(response: Response): Promise<T> => {
 const request = async <TResponse>(endpoint: string, init: RequestInit = {}): Promise<TResponse> => {
   const url = resolveBackendUrl(endpoint);
 
-  const response = await fetch(url, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(init.headers ?? {}),
-    },
-    ...init,
-  });
+  try {
+    const response = await fetch(url, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(init.headers ?? {}),
+      },
+      ...init,
+    });
 
-  if (!response.ok) {
-    let message = response.statusText;
-    try {
-      const body = await response.json();
-      message = body?.message ?? message;
-    } catch {
-      // ignore JSON parsing errors
+    if (!response.ok) {
+      let message = response.statusText;
+      try {
+        const body = await response.json();
+        message = body?.message ?? message;
+      } catch {
+        // ignore JSON parsing errors
+      }
+
+      throw new Error(message || `Request to ${endpoint} failed with status ${response.status}`);
     }
 
-    throw new Error(message || `Request to ${endpoint} failed with status ${response.status}`);
+    return asJson<TResponse>(response);
+  } catch (error) {
+    // Handle network errors gracefully
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Unable to connect to the API. Please check your connection and ensure the backend is running.');
+    }
+    throw error;
   }
-
-  return asJson<TResponse>(response);
 };
 
 const normalizeAccount = (account: AccountDto): AccountConnection => ({

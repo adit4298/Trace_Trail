@@ -26,15 +26,9 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
   const healthScore = riskMetric ? parseFloat(riskMetric.value) : 42;
   const healthBreakdown = useHealthBreakdown(snapshot.metrics, snapshot.trends);
   const quickActions = [
-    { id: 'link', label: 'Link Accounts', helper: 'Connect Google, Meta, X' },
-    { id: 'insights', label: 'View Insights', helper: 'Monitor anomalies' },
-    { id: 'signals', label: 'Check Signals', helper: 'See live events' }
-  ];
-  const accountStatus = [
-    { id: 'google', label: 'Google', detail: 'Identity telemetry', status: 'Synced' },
-    { id: 'instagram', label: 'Instagram', detail: 'Social footprint', status: 'Listening' },
-    { id: 'facebook', label: 'Facebook', detail: 'Network reach', status: 'Ready' },
-    { id: 'twitter', label: 'X / Twitter', detail: 'Signal feed', status: 'Queued' }
+    { id: 'link', label: 'Link Accounts', helper: 'Connect Google, Meta, X', href: '/dashboard/accounts' },
+    { id: 'insights', label: 'View Insights', helper: 'Monitor anomalies', href: '/insights' },
+    { id: 'signals', label: 'Check Signals', helper: 'See live events', href: '/signals' }
   ];
 
   return (
@@ -51,14 +45,14 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
 
           <div className="flex flex-wrap gap-3">
             {quickActions.map((action) => (
-              <button
+              <a
                 key={action.id}
-                type="button"
+                href={action.href}
                 className="min-w-[160px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-foreground transition hover:border-white/30 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <span className="block font-semibold">{action.label}</span>
                 <span className="text-xs text-muted">{action.helper}</span>
-              </button>
+              </a>
             ))}
           </div>
         </div>
@@ -75,24 +69,22 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
             <h2 className="text-xl font-semibold text-foreground">Manage and sync your connected platforms.</h2>
             <p className="text-sm text-muted">Each linked account unlocks richer insights and better coverage.</p>
           </div>
-          <span className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-            4 Providers
-          </span>
+          <a
+            href="/dashboard/accounts"
+            className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary transition hover:bg-primary/20"
+          >
+            Manage Accounts
+          </a>
         </header>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {accountStatus.map((account) => (
-            <div
-              key={account.id}
-              className="rounded-2xl border border-white/5 bg-white/5 px-4 py-4 text-sm text-foreground shadow-inner"
-            >
-              <div className="flex items-center justify-between">
-                <p className="font-semibold">{account.label}</p>
-                <span className="text-xs uppercase tracking-wide text-muted">{account.status}</span>
-              </div>
-              <p className="mt-1 text-xs text-muted">{account.detail}</p>
-            </div>
-          ))}
+        <div className="mt-6 rounded-2xl border border-white/5 bg-white/5 px-6 py-4 text-sm text-foreground">
+          <p className="text-muted">
+            Connect your accounts to enable insights. Visit{' '}
+            <a href="/dashboard/accounts" className="text-primary hover:underline">
+              Connected Accounts
+            </a>{' '}
+            to get started.
+          </p>
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2" id="onboarding-account-benefits">

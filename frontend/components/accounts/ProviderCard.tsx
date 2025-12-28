@@ -89,6 +89,8 @@ export const ProviderCard = ({
   const config = providerConfig[provider];
   const Icon = config.icon;
   const statusLabel = connected ? `Connected as ${username ?? email ?? '—'}` : 'Not connected';
+  // Check if API is available - NEXT_PUBLIC_ vars are available at build time in client components
+  const apiAvailable = Boolean(process.env.NEXT_PUBLIC_API_URL);
 
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-surface p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">
@@ -114,12 +116,13 @@ export const ProviderCard = ({
         {!connected ? (
           <button
             type="button"
-            onClick={onConnect}
-            disabled={isConnecting}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary/90 px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary disabled:opacity-60"
+            onClick={apiAvailable ? onConnect : undefined}
+            disabled={isConnecting || !apiAvailable}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary/90 px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary disabled:opacity-60 disabled:cursor-not-allowed"
+            title={!apiAvailable ? 'Integration coming soon - API not configured' : undefined}
           >
             <Share2 className="h-4 w-4" />
-            {isConnecting ? 'Opening...' : 'Connect'}
+            {isConnecting ? 'Opening...' : apiAvailable ? 'Connect' : 'Coming Soon'}
           </button>
         ) : (
           <>

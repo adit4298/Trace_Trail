@@ -46,7 +46,6 @@ export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
 
   try {
     return await fetchJson<DashboardSnapshot>(dashboardSummaryUrl, {
-      cache: 'force-cache',
       revalidate: 60,
       tags: ['dashboard']
     });
