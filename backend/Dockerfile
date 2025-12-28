@@ -26,6 +26,8 @@ USER appuser
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import os, socket; s = socket.create_connection(('127.0.0.1', int(os.environ.get('PORT', '8000'))), timeout=2); s.close()"
+# Optional – Docker-only healthcheck (K8s uses probes instead)
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD python -c "import os, socket; s = socket.create_connection(('127.0.0.1', int(os.environ.get('PORT', '8000'))), timeout=2); s.close()"
 
-CMD python -c "import os; import uvicorn; port = int(os.environ.get('PORT', 8000)); uvicorn.run('src.main:app', host='0.0.0.0', port=port)"
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
