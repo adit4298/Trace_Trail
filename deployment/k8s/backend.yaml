@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: tracetrail
+  namespace: tracettrail
   labels:
     app: backend
     app.kubernetes.io/part-of: tracetrail
@@ -92,7 +92,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: tracetrail
+  namespace: tracettrail
   labels:
     app: backend
 spec:
