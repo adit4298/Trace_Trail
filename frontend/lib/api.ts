@@ -14,31 +14,54 @@ export async function fetchJson<T>(endpoint: string, options: FetchOptions = {})
   const { revalidate, tags, ...rest } = options;
   const url = resolveUrl(endpoint);
 
-  const response = await fetch(url, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(rest.headers ?? {})
-    },
-    cache: rest.cache ?? 'no-store',
-    next:
-      typeof revalidate !== 'undefined' || (tags && tags.length)
-        ? {
-            revalidate,
-            tags
-          }
-        : undefined
-  });
+  // Add timeout for build-time requests (5 seconds)
+  const timeoutMs = 5000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error(await toErrorMessage(response));
+  try {
+    const response = await fetch(url, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(rest.headers ?? {})
+      },
+      // Only set cache if revalidate/tags are not specified (they conflict)
+      cache: typeof revalidate !== 'undefined' || (tags && tags.length) ? undefined : (rest.cache ?? 'no-store'),
+      next:
+        typeof revalidate !== 'undefined' || (tags && tags.length)
+          ? {
+              revalidate,
+              tags
+            }
+          : undefined
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(await toErrorMessage(response));
+    }
+
+    return response.json() as Promise<T>;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Request timeout: ${url}`);
+    }
+    throw error;
   }
-
-  return response.json() as Promise<T>;
 }
 
 export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
-  if (!API_BASE_URL) {
+  // During build time, always use mock data to prevent timeouts
+  // Check for build-time indicators
+  const isBuildTime = 
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NODE_ENV === 'production' && !process.env.VERCEL && !process.env.RENDER;
+  
+  if (!API_BASE_URL || isBuildTime) {
     return mockDashboardSnapshot;
   }
 
@@ -50,7 +73,10 @@ export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
       tags: ['dashboard']
     });
   } catch (error) {
-    console.warn('[lib/api] Falling back to mock dashboard payload', error);
+    // Silently fall back to mock data - don't log during build
+    if (process.env.NEXT_PHASE !== 'phase-production-build') {
+      console.warn('[lib/api] Falling back to mock dashboard payload', error);
+    }
     return mockDashboardSnapshot;
   }
 }

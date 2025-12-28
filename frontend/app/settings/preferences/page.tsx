@@ -1,6 +1,9 @@
 import { AppShell } from '@/components/AppShell';
 import { fetchDashboardSnapshot } from '@/lib/api';
 
+// Force dynamic rendering to prevent build-time API calls
+export const dynamic = 'force-dynamic';
+
 export default async function PreferencesPage() {
   const snapshot = await fetchDashboardSnapshot();
 
