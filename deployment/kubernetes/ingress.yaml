@@ -9,7 +9,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:661235013110:certificate/d1159438-3860-403c-bb19-1d504a33c970
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:027551668461:certificate/d1159438-3860-403c-bb19-1d504a33c970
     alb.ingress.kubernetes.io/group.name: tracetrail
 
 spec:
