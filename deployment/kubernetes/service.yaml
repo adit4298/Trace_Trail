@@ -18,7 +18,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tracetrail-frontend-config
-  namespace: tracetrail
+  namespace: tracettrail
 data:
   NEXT_PUBLIC_API_URL: "https://api.tracetrail.in"
 ---
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: tracetrail-backend-secrets
-  namespace: tracetrail
+  namespace: tracettrail
 type: Opaque
 stringData:
   DATABASE_URL: "postgresql+psycopg://tracetrail:CHANGE_ME@postgres:5432/trace_trail"
