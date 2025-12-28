@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     SHOW_DOCS: bool = True
     FRONTEND_APP_URL: str = "http://localhost:3000"
-    FRONTEND_OAUTH_CALLBACK_URL: str = "http://localhost:3000/oauth/callback"
+    FRONTEND_OAUTH_CALLBACK_URL: str = "https://app.tracetrail.in/oauth/callback"
 
     # Database
     DB_USER: str = "postgres"
@@ -43,19 +43,19 @@ class Settings(BaseSettings):
     # OAuth client configuration
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: SecretStr = SecretStr("")
-    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/auth/google/callback"
+    GOOGLE_REDIRECT_URI: str = "https://api.tracetrail.in/auth/google/callback"
 
     INSTAGRAM_CLIENT_ID: str = ""
     INSTAGRAM_CLIENT_SECRET: SecretStr = SecretStr("")
-    INSTAGRAM_REDIRECT_URI: str = "http://localhost:8000/auth/instagram/callback"
+    INSTAGRAM_REDIRECT_URI: str = "https://api.tracetrail.in/auth/instagram/callback"
 
     FACEBOOK_CLIENT_ID: str = ""
     FACEBOOK_CLIENT_SECRET: SecretStr = SecretStr("")
-    FACEBOOK_REDIRECT_URI: str = "http://localhost:8000/auth/facebook/callback"
+    FACEBOOK_REDIRECT_URI: str = "https://api.tracetrail.in/auth/facebook/callback"
 
     TWITTER_CLIENT_ID: str = ""
     TWITTER_CLIENT_SECRET: SecretStr = SecretStr("")
-    TWITTER_REDIRECT_URI: str = "http://localhost:8000/auth/twitter/callback"
+    TWITTER_REDIRECT_URI: str = "https://api.tracetrail.in/auth/twitter/callback"
 
     # Scheduler
     SYNC_INTERVAL_HOURS: int = 6

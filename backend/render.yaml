@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: tracetrail-api
+    env: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements/base.txt
+    startCommand: python -c "import os; import uvicorn; port = int(os.environ.get('PORT', 8000)); uvicorn.run('src.main:app', host='0.0.0.0', port=port)"
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: SHOW_DOCS
+        value: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tracetrail-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: OAUTH_STATE_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["https://app.tracetrail.in", "http://localhost:5173", "http://localhost:3000"]'
+      - key: FRONTEND_OAUTH_CALLBACK_URL
+        value: https://app.tracetrail.in/oauth/callback
+      - key: GOOGLE_REDIRECT_URI
+        value: https://api.tracetrail.in/auth/google/callback
+      - key: INSTAGRAM_REDIRECT_URI
+        value: https://api.tracetrail.in/auth/instagram/callback
+      - key: FACEBOOK_REDIRECT_URI
+        value: https://api.tracetrail.in/auth/facebook/callback
+      - key: TWITTER_REDIRECT_URI
+        value: https://api.tracetrail.in/auth/twitter/callback
+
+databases:
+  - name: tracetrail-db
+    plan: free
+    databaseName: trace_trail
+    user: tracetrail_user
+
