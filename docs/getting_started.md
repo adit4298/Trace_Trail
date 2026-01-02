@@ -43,9 +43,9 @@ Trace_Trail/
    - `DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/tracetrail`
    - `SECRET_KEY=<random 32+ char string>`
    - `EXTENSION_WEBSOCKET_ENABLED=false` unless testing the extension.
-3. Frontend consumes environment values prefixed with `VITE_` (see
-   `frontend/.env.example` if available). By default it points to
-   `http://localhost:8000`.
+3. Frontend consumes environment values prefixed with `NEXT_PUBLIC_` (see
+   `frontend/.env.local` if available). By default it points to
+   `http://localhost:8000` for local development.
 
 ---
 
@@ -71,12 +71,13 @@ uvicorn src.main:app --reload
 ```bash
 cd frontend
 npm install
-npm run dev            # Starts Vite on http://localhost:5173
+npm run dev            # Starts Next.js on http://localhost:3000
 ```
 
-- Routes are defined in `src/App.tsx`.
-- Shared UI sits inside `src/components/`.
-- Global state lives in `src/context/` with dedicated React contexts.
+- Routes are defined using Next.js App Router (`app/` directory).
+- Shared UI sits inside `components/`.
+- Global state lives in React contexts and hooks.
+- Set `NEXT_PUBLIC_API_URL=http://localhost:8000` in `.env.local` for local development.
 
 ---
 

@@ -8,14 +8,15 @@ picked them.
 
 ## Frontend
 
-- **Framework:** React 18 + TypeScript.
-- **Tooling:** Vite, ESLint, Prettier, Tailwind CSS, PostCSS.
-- **UI Libraries:** Recharts (visualizations), Framer Motion (animations),
-  React Hook Form + Zod (forms/validation).
-- **State:** React Context + custom hooks (`useAuth`, `useDashboard`).
-- **Testing:** Vitest/RTL (to be enabled).
+- **Framework:** Next.js 14 + React 18 + TypeScript.
+- **Tooling:** Next.js App Router, ESLint, Prettier, Tailwind CSS, PostCSS.
+- **UI Libraries:** Recharts (visualizations), Lucide React (icons),
+  React Context for state management.
+- **State:** React Context + custom hooks, Next.js server components.
+- **Deployment:** Vercel (automatic deployments, SSL, CDN).
+- **Testing:** Jest + React Testing Library (configured).
 
-Reasoning: fast DX, HMR, strong typing, and small bundle sizes.
+Reasoning: Server-side rendering, excellent DX, automatic optimizations, zero-config deployment.
 
 ---
 
@@ -48,12 +49,18 @@ Reasoning: Keeps ML dependencies isolated while reusing Python expertise.
 
 ## DevOps & Tooling
 
-- **Containerization:** Docker + docker-compose for local parity.
-- **CI/CD:** GitHub Actions / Azure DevOps templates stored in `deployment/`.
-- **IaC:** Terraform/Bicep scripts (when added) live side-by-side in
-  `deployment/`.
-- **Monitoring:** Logging via platform (CloudWatch/App Insights). OTEL to be
-  added.
+- **Containerization:** Docker + docker-compose for local development.
+- **CI/CD:** 
+  - Vercel: Automatic deployments on Git push
+  - Render: Automatic deployments on Git push (or manual)
+- **Hosting:**
+  - Frontend: Vercel (free tier, no credit card required)
+  - Backend: Render (free tier, no credit card required)
+  - Database: Render PostgreSQL (free tier)
+- **Monitoring:** 
+  - Vercel: Built-in analytics and logs
+  - Render: Built-in logs and metrics
+  - Health checks: `/health` endpoint on backend
 
 ---
 

@@ -20,9 +20,9 @@ expectations for code contributions, documentation updates, and reviews.
 
 - **Backend:** Python 3.11, FastAPI, SQLAlchemy. Run `ruff` (if configured) and
   `pytest`. Respect typing hints and keep services/repositories focused.
-- **Frontend:** React + TypeScript. Run `npm run lint` + `npm run test` (once
-  enabled). Follow component folder boundaries and rely on hooks/contexts when
-  sharing logic.
+- **Frontend:** Next.js 14 + React + TypeScript. Run `npm run lint` + `npm run typecheck`.
+  Follow Next.js App Router patterns and component folder boundaries. Use React Context
+  and hooks for state management.
 - **AI Module:** Keep notebooks reproducible; document datasets in
   `ai_module/data/README` before checking in. Run `pytest` in `ai_module/tests/`.
 - Write or update docs in `docs/` when you add new endpoints, env vars, or

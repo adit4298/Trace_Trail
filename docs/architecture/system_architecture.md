@@ -7,33 +7,120 @@ This document outlines how Trace Trail components interact end-to-end. Refer to
 
 ## High-Level Components
 
-1. **Clients**
-   - React SPA (`frontend/`) served via CDN.
-   - Chrome extension (`chrome_extension/`) for optional telemetry.
-   - API consumers (Postman, partner integrations).
-2. **API Layer**
-   - FastAPI service (`backend/src/main.py`) exposing REST + WebSocket endpoints.
-3. **AI/Risk Engine**
-   - Standalone module (`ai_module/`) for scoring, recommendations, anomaly
-     detection.
-4. **Data Stores**
-   - PostgreSQL for transactional data.
-   - Optional object storage/S3 for generated reports (future).
-5. **Messaging/Real-time**
-   - WebSockets for extension push updates. Future support for message queues.
+### 1. Client Layer
+
+**Next.js Frontend** (`frontend/`):
+- **Technology**: Next.js 14 with App Router, React 18, TypeScript
+- **Deployment**: Vercel at `https://app.tracetrail.in`
+- **Features**: 
+  - Server-side rendering for SEO
+  - Client-side interactivity
+  - Dashboard visualization
+  - Account management UI
+  - Settings and preferences
+- **Communication**: REST API to backend
+
+**Chrome Extension** (`chrome_extension/`):
+- **Status**: Optional, for future telemetry collection
+- **Purpose**: Capture browsing signals
+- **Communication**: REST API or WebSocket to backend
+
+**API Consumers**:
+- Postman collections for testing
+- Future: Partner integrations
+
+### 2. API Layer
+
+**FastAPI Backend** (`backend/`):
+- **Technology**: FastAPI, Python 3.11, SQLAlchemy
+- **Deployment**: Render at `https://api.tracetrail.in`
+- **Features**:
+  - REST API endpoints
+  - OAuth 2.0 implementation
+  - JWT authentication
+  - Account synchronization
+  - Signal processing
+  - Anomaly detection
+  - Health score calculation
+- **Architecture**: Modular routes, service layer, repository pattern
+
+### 3. AI/Risk Engine
+
+**AI Module** (`ai_module/`):
+- **Technology**: Python, scikit-learn, custom ML models
+- **Status**: Development/testing, optional for production
+- **Features**:
+  - Risk scoring algorithms
+  - Anomaly detection models
+  - Recommendation engine
+  - Trend analysis
+- **Integration**: Called by backend via HTTP or shared library
+
+### 4. Data Stores
+
+**PostgreSQL Database**:
+- **Location**: Render PostgreSQL (free tier)
+- **Purpose**: Primary data store
+- **Tables**: users, oauth_connections, signals, anomalies, system_health, activities
+- **Features**: 
+  - ACID compliance
+  - JSONB for flexible schemas
+  - Encrypted token storage
+  - Relational integrity
+
+**Future Storage**:
+- Object storage for generated reports
+- Cache layer (Redis) for performance
+
+### 5. Messaging/Real-time
+
+**Current**: REST API only
+
+**Future**:
+- WebSockets for real-time updates
+- Message queues for background processing
+- Event streaming for analytics
 
 ---
 
 ## Request Flow
 
-1. User hits SPA (Vite build). React Router loads appropriate page.
-2. Page calls Axios service (e.g. `analysisService.ts`) pointing to FastAPI.
-3. FastAPI router (e.g. `src.analysis.router`) delegates to service class and
-   repository.
-4. SQLAlchemy queries Postgres via `src.core.database` engine/session.
-5. Responses return to the SPA. Dashboard contexts update local state.
-6. Optional: backend invokes `ai_module` via internal HTTP call or shared lib for
-   advanced scoring before persisting results.
+### Server-Side Rendering (Next.js)
+
+1. **User requests page** → Next.js server receives request
+2. **Server Component executes** → Calls `fetchDashboardSnapshot()`
+3. **API request** → HTTP request to FastAPI backend
+4. **FastAPI router** → Route handler (e.g. `dashboard_routes.py`)
+5. **Dependency injection** → Auth, database session injected
+6. **Service layer** → Business logic (e.g. `HealthService`)
+7. **Database query** → SQLAlchemy queries PostgreSQL
+8. **Response** → Data returned to Next.js
+9. **Server Component renders** → HTML generated with data
+10. **Client receives** → Fully rendered HTML with data
+
+### Client-Side Interaction
+
+1. **User action** → Client Component event handler
+2. **API service call** → `accountService.getAccounts()`
+3. **HTTP request** → Fetch to FastAPI backend
+4. **FastAPI processes** → Same flow as above
+5. **Response** → JSON data returned
+6. **State update** → React state updated
+7. **UI re-render** → Component updates with new data
+
+### OAuth Flow
+
+1. **User clicks "Connect"** → Frontend calls `/auth/{provider}/redirect`
+2. **Backend generates state** → JWT token with user ID
+3. **OAuth URL returned** → Frontend redirects user
+4. **User authorizes** → OAuth provider processes
+5. **Provider callback** → Redirects to `/auth/{provider}/callback`
+6. **Backend verifies state** → Validates JWT token
+7. **Token exchange** → Exchanges code for access/refresh tokens
+8. **Encrypt and store** → Tokens encrypted and saved to database
+9. **Initial sync** → Backend fetches data from provider
+10. **Process data** → Creates signals, detects anomalies
+11. **Redirect to frontend** → Success/error redirect
 
 ---
 
@@ -50,11 +137,15 @@ When `EXTENSION_WEBSOCKET_ENABLED=true`:
 
 ## Deployment Topology
 
-- **Local:** Docker Compose stands up Postgres + backend; frontend runs via Vite.
-- **Staging/Prod:** API deployed as container(s) behind a load balancer. SPA is
-  hosted on static hosting (S3+CloudFront, Azure Static Web Apps, etc.). AI
-  module can scale independently.
-- **CI/CD:** Workflows under `deployment/` build/push images and run migrations.
+- **Local:** Docker Compose stands up Postgres + backend; frontend runs via Next.js dev server.
+- **Production:** 
+  - Frontend: Vercel (Next.js hosting with automatic deployments)
+  - Backend: Render (FastAPI web service with PostgreSQL)
+  - Domain: `tracetrail.in` with subdomains `app.tracetrail.in` and `api.tracetrail.in`
+- **CI/CD:** 
+  - Vercel: Automatic deployments on push to `main`
+  - Render: Automatic deployments on push to `main` (or manual via dashboard)
+  - Database migrations: Run manually via Render Shell
 
 ---
 

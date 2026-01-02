@@ -7,13 +7,18 @@ This guide explains how to run the **entire TraceTrail stack** (frontend, backen
 ## 1. High‑level architecture
 
 - **Frontend (`frontend/`)**: Next.js 14 + TypeScript dashboard on **http://localhost:3000**.
-- **Backend (`backend/`)**: FastAPI service with PostgreSQL + Redis on **http://localhost:8000**.
-- **AI Module (`ai_module/`)**: FastAPI microservice for analytics on **http://localhost:8082**.
+- **Backend (`backend/`)**: FastAPI service with PostgreSQL on **http://localhost:8000**.
+- **AI Module (`ai_module/`)**: FastAPI microservice for analytics on **http://localhost:8082** (optional).
 - **Shared infrastructure**:
   - **PostgreSQL** for application data.
-  - **Redis** for caching / future background tasks.
+  - **Redis** (optional) for caching / future background tasks.
 
 All services are wired together in the root `docker-compose.yml`.
+
+**Production Deployment:**
+- Frontend: Vercel at `https://app.tracetrail.in`
+- Backend: Render at `https://api.tracetrail.in`
+- Database: Render PostgreSQL
 
 ---
 

@@ -42,17 +42,17 @@ Typical flow:
 
 ## High-Level Architecture
 
-- **Frontend** — React + TypeScript + Vite SPA, served separately, talks to the
-  backend via REST. Context providers handle auth, dashboard state, and themes.
-- **Backend** — FastAPI service with modular routers for auth, analysis,
-  challenges, reports, visualizations, and extension streaming. SQLAlchemy +
-  Alembic manage persistence.
+- **Frontend** — Next.js 14 + TypeScript, deployed on Vercel. Server-side rendering
+  with client-side interactivity. Context providers handle auth, dashboard state, and themes.
+- **Backend** — FastAPI service deployed on Render with modular routers for auth, analysis,
+  OAuth connections, sync, signals, anomalies, and insights. SQLAlchemy + Alembic manage persistence.
 - **AI Module** — Python service focused on scoring and recommendation engines.
-  Feeds synthetic data, anomaly detection, and trend analysis back to the
-  backend.
+  Feeds synthetic data, anomaly detection, and trend analysis back to the backend.
 - **Chrome Extension** — Optional channel for capturing live browsing signals.
-- **Deployment** — Docker Compose for local parity, plus IaC templates in
-  `deployment/` to target cloud infra.
+- **Deployment** — 
+  - **Production**: Vercel (frontend) + Render (backend + PostgreSQL)
+  - **Local**: Docker Compose for development parity
+  - **Domain**: `tracetrail.in` with subdomains `app.tracetrail.in` and `api.tracetrail.in`
 
 See `docs/architecture/system_architecture.md` for sequence diagrams.
 
@@ -87,9 +87,12 @@ See `docs/architecture/system_architecture.md` for sequence diagrams.
 
 - ✅ Backend CRUD + analysis engine baseline.
 - ✅ Frontend experience with dashboards, insights, recommendations.
+- ✅ Production deployment on free platforms (Vercel + Render).
+- ✅ OAuth integration (Google, Instagram, Facebook, Twitter/X).
+- ✅ Frontend UI stabilization and error handling.
 - 🚧 AI module integration into production workloads.
 - 🚧 Automated report export & sharing.
-- 🔜 SOC2-ready deployment pipelines and observability packs.
+- 🔜 Enhanced observability and monitoring.
 
 Open product questions are tracked in `qa/` and surfaced as GitHub issues.
 

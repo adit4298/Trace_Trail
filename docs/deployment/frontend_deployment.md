@@ -1,6 +1,6 @@
 # Frontend Deployment Guide
 
-Use this guide to build and deploy the React SPA contained in `frontend/`.
+Use this guide to build and deploy the Next.js application contained in `frontend/`.
 
 ---
 
@@ -12,33 +12,54 @@ npm install
 npm run build
 ```
 
-Vite outputs assets to `frontend/dist/`. Files are ready for any static host.
+Next.js outputs optimized production build to `.next/` directory. The build includes:
+- Static pages (pre-rendered)
+- Dynamic pages (server-rendered on demand)
+- API routes (if any)
+- Optimized assets (JS, CSS, images)
 
 ---
 
 ## 2. Hosting Options
 
-| Platform                | Notes                                                     |
-| ---------------------- | --------------------------------------------------------- |
-| AWS S3 + CloudFront    | Upload `dist/` to S3, enable compression + cache headers. |
-| Azure Static Web Apps  | Connect repo, configure workflow to run `npm run build`.  |
-| Netlify/Vercel         | Set build command `npm run build`, output directory `dist`.|
-| Custom Nginx container | Serve `/dist` via Nginx, configure SPA fallback.          |
+| Platform                | Notes                                                     | Status        |
+| ---------------------- | --------------------------------------------------------- | ------------- |
+| **Vercel**             | Zero-config Next.js deployment, automatic SSL, CDN.       | ✅ **Current** |
+| Netlify                | Next.js support, set build command `npm run build`.       | Available     |
+| AWS Amplify            | Next.js hosting with CI/CD integration.                   | Available     |
+| Custom Node.js server  | Run `npm start` to serve Next.js production server.      | Available     |
 
-Ensure SPA fallback rewrites unknown routes to `index.html`.
+**Current Production**: Deployed on Vercel at `https://app.tracetrail.in`
+
+Vercel automatically:
+- Detects Next.js framework
+- Builds on every push to `main`
+- Provisions SSL certificates
+- Handles routing and API routes
+- Optimizes assets and caching
 
 ---
 
 ## 3. Environment Variables
 
-- At build time, set `VITE_API_BASE_URL` and other vars via platform settings.
-- For static hosts, you must re-build when environment values change.
+- At build time, set `NEXT_PUBLIC_*` variables via platform settings.
+- These are embedded in the client bundle at build time.
+- Server-side variables (without `NEXT_PUBLIC_`) are only available in API routes.
 
-Example (Netlify):
+**Current Production (Vercel)**:
+```
+NEXT_PUBLIC_API_URL=https://api.tracetrail.in
+```
 
+**Local Development** (`.env.local`):
 ```
-VITE_API_BASE_URL=https://api.staging.tracetrail.com
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
+
+**Important**: 
+- Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser
+- Never put secrets in `NEXT_PUBLIC_` variables
+- Rebuild required when `NEXT_PUBLIC_` variables change
 
 ---
 
