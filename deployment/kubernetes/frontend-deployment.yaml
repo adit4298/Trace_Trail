@@ -6,7 +6,7 @@ metadata:
   labels:
     app: frontend
     app.kubernetes.io/component: web
-    app.kubernetes.io/part-of: tracetrail
+    app.kubernetes.io/part-of: tracettrail
 spec:
   replicas: 2
   selector:
@@ -22,6 +22,11 @@ spec:
         - name: frontend
           image: 027551668461.dkr.ecr.ap-southeast-2.amazonaws.com/tracettrail-frontend:latest
           imagePullPolicy: Always
+
+          env:
+            - name: NEXT_PUBLIC_BACKEND_URL
+              value: http://backend
+
           ports:
             - name: http
               containerPort: 3000
@@ -49,7 +54,6 @@ spec:
               memory: 512Mi
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -62,6 +66,6 @@ spec:
     app: frontend
   ports:
     - name: http
-      port: 80        # internal service port
-      targetPort: 3000  # Node container port
-  type: ClusterIP     # IMPORTANT: we use Ingress + ALB, not LoadBalancer
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
