@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-load-balancer-controller
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-load-balancer-controller
+  template:
+    metadata:
+      labels:
+        app: aws-load-balancer-controller
+    spec:
+      serviceAccountName: aws-load-balancer-controller
+      containers:
+        - name: controller
+          image: public.ecr.aws/eks/aws-load-balancer-controller:v2.17.0
+          args:
+            - --cluster-name=tracetrail
+            - --region=ap-southeast-2
+            - --ingress-class=alb
+            - --aws-vpc-id=vpc-05c51c0d2070ea868
+            - --v=2
