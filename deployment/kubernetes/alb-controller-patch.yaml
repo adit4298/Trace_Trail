@@ -9,7 +9,7 @@ spec:
       containers:
         - name: controller
           args:
-            - --cluster-name=tracetrail
+            - --cluster-name=tracettrail
             - --ingress-class=alb
             - --region=ap-southeast-2
             - --v=2
