@@ -19,7 +19,7 @@ spec:
           image: public.ecr.aws/eks/aws-load-balancer-controller:v2.17.0
           args:
             - --cluster-name=tracetrail
-            - --region=ap-southeast-2
             - --ingress-class=alb
+            - --aws-region=ap-southeast-2
             - --aws-vpc-id=vpc-05c51c0d2070ea868
             - --v=2
