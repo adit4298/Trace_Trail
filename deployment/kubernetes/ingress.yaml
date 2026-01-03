@@ -7,30 +7,11 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/group.name: tracettrail
-
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
-
-    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-southeast-2:027551668461:certificate/c0d7498d-59c7-46d0-be2a-13e8470de5da"
-
-    alb.ingress.kubernetes.io/actions.ssl-redirect: >
-      {"Type":"redirect","RedirectConfig":{"Protocol":"HTTPS","Port":"443","StatusCode":"HTTP_301"}}
-
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:027551668461:certificate/c0d7498d-59c7-46d0-be2a-13e8470de5da
 spec:
-  ingressClassName: alb
   rules:
-    # ---------- HTTP → HTTPS redirect ----------
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ssl-redirect
-                port:
-                  name: use-annotation
-
-    # ---------- Frontend ----------
     - host: app.tracetrail.in
       http:
         paths:
@@ -41,8 +22,6 @@ spec:
                 name: frontend
                 port:
                   number: 80
-
-    # ---------- Backend API ----------
     - host: api.tracetrail.in
       http:
         paths:
@@ -52,4 +31,4 @@ spec:
               service:
                 name: backend
                 port:
-                  number: 80
+                  number: 8000
