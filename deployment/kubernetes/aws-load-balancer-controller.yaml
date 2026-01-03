@@ -20,5 +20,6 @@ spec:
           args:
             - --cluster-name=tracetrail
             - --ingress-class=alb
-            - --region=ap-southeast-2
+            - --aws-region=ap-southeast-2
             - --aws-vpc-id=vpc-05c51c0d2070ea868
+            - --log-level=info
