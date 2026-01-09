@@ -1,34 +1,24 @@
-# syntax=docker/dockerfile:1
-
+# ---------- Builder ----------
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN apk add --no-cache libc6-compat
-
-COPY package*.json ./
-RUN npm ci
+COPY package.json package-lock.json ./
+RUN npm install
 
 COPY . .
-
 RUN npm run build
 
+# ---------- Runner ----------
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000
+ENV NODE_ENV=production
 
-RUN apk add --no-cache libc6-compat
-
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
+# Copy everything needed at runtime
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-
-RUN npm ci --omit=dev
 
 EXPOSE 3000
 
