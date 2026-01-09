@@ -5,9 +5,9 @@ import type { DashboardSnapshot } from '@/lib/types';
 /**
  * PUBLIC API base URL
  * .env.production MUST contain:
- * NEXT_PUBLIC_API_BASE_URL=https://api.tracetrail.in
+ * NEXT_PUBLIC_API_URL=https://api.tracetrail.in
  */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Typed fetch helper
@@ -24,7 +24,7 @@ function resolveUrl(path: string): string {
   if (path.startsWith('http')) return path;
 
   if (!API_BASE_URL) {
-    throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+    throw new Error('NEXT_PUBLIC_API_URL is not defined');
   }
 
   return `${API_BASE_URL}${path}`;
