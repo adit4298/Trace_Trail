@@ -1,24 +1,14 @@
 'use client';
 
-import { apiGet, apiPost } from './api';
+import { apiFetch } from './api';
 
 export type Provider = 'google' | 'instagram' | 'facebook' | 'twitter';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
-
-const ensureApiBaseUrl = (): string => {
-    if (!API_BASE_URL) {
-        throw new Error('NEXT_PUBLIC_API_URL must be configured for backend requests.');
-    }
-
-    return API_BASE_URL;
-};
-
-const accountsEndpoint = () => `${ensureApiBaseUrl()}/accounts`;
-const oauthRedirectEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/auth/${provider}/redirect`;
-const accountDisconnectEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/accounts/${provider}/disconnect`;
-const syncProviderEndpoint = (provider: Provider) => `${ensureApiBaseUrl()}/sync/${provider}`;
-const syncAllEndpoint = () => `${ensureApiBaseUrl()}/sync/all`;
+const accountsEndpoint = () => '/accounts';
+const oauthRedirectEndpoint = (provider: Provider) => `/auth/${provider}/redirect`;
+const accountDisconnectEndpoint = (provider: Provider) => `/accounts/${provider}/disconnect`;
+const syncProviderEndpoint = (provider: Provider) => `/sync/${provider}`;
+const syncAllEndpoint = () => '/sync/all';
 
 interface AccountDto {
     provider: Provider;
@@ -47,7 +37,7 @@ const normalizeAccount = (dto: AccountDto): AccountConnection => ({
 });
 
 export const getAccounts = async (): Promise<AccountConnection[]> => {
-    const response = await apiGet<AccountDto[]>(accountsEndpoint());
+    const response = await apiFetch<AccountDto[]>(accountsEndpoint());
     const map = new Map<Provider, AccountConnection>(response.map((item) => [item.provider, normalizeAccount(item)]));
 
     return PROVIDERS.map(
@@ -61,7 +51,7 @@ export const getAccounts = async (): Promise<AccountConnection[]> => {
 };
 
 export const getOAuthRedirectUrl = async (provider: Provider): Promise<string> => {
-    const response = await apiGet<{ authorization_url?: string; url?: string }>(oauthRedirectEndpoint(provider));
+    const response = await apiFetch<{ authorization_url?: string; url?: string }>(oauthRedirectEndpoint(provider));
     const redirectUrl = response.authorization_url ?? response.url;
     if (!redirectUrl) {
         throw new Error('No redirect URL returned from OAuth endpoint');
@@ -70,15 +60,15 @@ export const getOAuthRedirectUrl = async (provider: Provider): Promise<string> =
 };
 
 export const disconnectAccount = async (provider: Provider): Promise<void> => {
-    await apiPost(accountDisconnectEndpoint(provider), {});
+    await apiFetch(accountDisconnectEndpoint(provider), { method: 'POST', body: JSON.stringify({}) });
 };
 
 export const syncProvider = async (provider: Provider): Promise<void> => {
-    await apiPost(syncProviderEndpoint(provider), {});
+    await apiFetch(syncProviderEndpoint(provider), { method: 'POST', body: JSON.stringify({}) });
 };
 
 export const syncAll = async (): Promise<void> => {
-    await apiPost(syncAllEndpoint(), {});
+    await apiFetch(syncAllEndpoint(), { method: 'POST', body: JSON.stringify({}) });
 };
 
 

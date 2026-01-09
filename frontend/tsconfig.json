@@ -23,7 +23,8 @@
       "react",
       "react-dom",
       "jest",
-      "node"
+      "node",
+      "vite/client"
     ],
     "baseUrl": ".",
     "paths": {
