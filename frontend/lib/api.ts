@@ -47,10 +47,7 @@ async function fetchJson<T>(
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers ?? {})
-      },
-      next: options.revalidate
-        ? { revalidate: options.revalidate, tags: options.tags }
-        : undefined
+      }
     });
 
     if (!response.ok) {
