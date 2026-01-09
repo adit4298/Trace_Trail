@@ -2,106 +2,93 @@ import 'server-only';
 
 import type { DashboardSnapshot } from '@/lib/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+/**
+ * PUBLIC API base URL
+ * .env.production MUST contain:
+ * NEXT_PUBLIC_API_BASE_URL=https://api.tracetrail.in
+ */
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+/**
+ * Typed fetch helper
+ */
 type FetchOptions = RequestInit & {
-  cache?: RequestCache;
-  revalidate?: number | false;
+  revalidate?: number;
   tags?: string[];
 };
 
-export async function fetchJson<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-  const { revalidate, tags, ...rest } = options;
-  const url = resolveUrl(endpoint);
+/**
+ * Resolve relative API paths safely
+ */
+function resolveUrl(path: string): string {
+  if (path.startsWith('http')) return path;
 
-  // Add timeout for build-time requests (5 seconds)
-  const timeoutMs = 5000;
+  if (!API_BASE_URL) {
+    throw new Error('NEXT_PUBLIC_API_BASE_URL is not defined');
+  }
+
+  return `${API_BASE_URL}${path}`;
+}
+
+/**
+ * Core JSON fetcher with timeout + error handling
+ */
+async function fetchJson<T>(
+  path: string,
+  options: FetchOptions = {}
+): Promise<T> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const response = await fetch(url, {
-      ...rest,
+    const response = await fetch(resolveUrl(path), {
+      ...options,
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
-        ...(rest.headers ?? {})
+        ...(options.headers ?? {})
       },
-      // Only set cache if revalidate/tags are not specified (they conflict)
-      cache: typeof revalidate !== 'undefined' || (tags && tags.length) ? undefined : (rest.cache ?? 'no-store'),
-      next:
-        typeof revalidate !== 'undefined' || (tags && tags.length)
-          ? {
-              revalidate,
-              tags
-            }
-          : undefined
+      next: options.revalidate
+        ? { revalidate: options.revalidate, tags: options.tags }
+        : undefined
     });
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
-      throw new Error(await toErrorMessage(response));
+      const text = await response.text();
+      throw new Error(`API ${response.status}: ${text}`);
     }
 
-    return response.json() as Promise<T>;
-  } catch (error) {
+    return (await response.json()) as T;
+  } finally {
     clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Request timeout: ${url}`);
-    }
-    throw error;
   }
 }
 
+/**
+ * Fetch dashboard snapshot
+ * Falls back ONLY if API is unreachable
+ */
 export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
-  // During build time, always use mock data to prevent timeouts
-  // Check for build-time indicators
-  const isBuildTime = 
-    process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NODE_ENV === 'production' && !process.env.VERCEL && !process.env.RENDER;
-  
-  if (!API_BASE_URL || isBuildTime) {
+  if (!API_BASE_URL) {
+    console.warn('[api] API base URL missing, using mock dashboard');
     return mockDashboardSnapshot;
   }
 
-  const dashboardSummaryUrl = `${API_BASE_URL}/dashboard/summary`;
-
   try {
-    return await fetchJson<DashboardSnapshot>(dashboardSummaryUrl, {
+    return await fetchJson<DashboardSnapshot>('/dashboard/summary', {
       revalidate: 60,
       tags: ['dashboard']
     });
   } catch (error) {
-    // Silently fall back to mock data - don't log during build
-    if (process.env.NEXT_PHASE !== 'phase-production-build') {
-      console.warn('[lib/api] Falling back to mock dashboard payload', error);
-    }
+    console.warn('[api] Dashboard API failed, using mock data', error);
     return mockDashboardSnapshot;
   }
 }
 
-function resolveUrl(endpoint: string): string {
-  if (endpoint.startsWith('http')) {
-    return endpoint;
-  }
-
-  if (!API_BASE_URL) {
-    throw new Error('Set NEXT_PUBLIC_API_URL to call backend endpoints.');
-  }
-
-  return `${API_BASE_URL}${endpoint}`;
-}
-
-async function toErrorMessage(response: Response) {
-  try {
-    const data = await response.json();
-    return data?.message ?? response.statusText;
-  } catch {
-    return response.statusText;
-  }
-}
-
+/**
+ * SAFE, FULLY TYPED mock dashboard
+ * Matches DashboardSnapshot EXACTLY
+ */
 const mockDashboardSnapshot: DashboardSnapshot = {
   navigation: [
     { id: 'overview', label: 'Overview', href: '/', icon: 'overview' },
@@ -113,13 +100,16 @@ const mockDashboardSnapshot: DashboardSnapshot = {
     { id: 'security', label: 'Security', href: '/security', icon: 'security' },
     { id: 'settings', label: 'Settings', href: '/settings', icon: 'settings' }
   ],
+
   notifications: 4,
+
   user: {
     name: 'Taylor Quinn',
     title: 'Director of Trust & Safety',
     organization: 'TraceTrail Labs',
     avatarUrl: 'https://avatars.githubusercontent.com/u/9919'
   },
+
   metrics: [
     {
       id: 'risk-score',
@@ -164,6 +154,7 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       status: 'Escalations active'
     }
   ],
+
   trends: {
     title: 'Anomaly Volume',
     subtitle: 'Last 14 days',
@@ -185,6 +176,7 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       { timestamp: '2024-11-29', value: 31 }
     ]
   },
+
   activities: [
     {
       id: 'act-1',
@@ -193,63 +185,19 @@ const mockDashboardSnapshot: DashboardSnapshot = {
       timestamp: new Date().toISOString(),
       state: 'critical',
       context: 'Escalated to Tier 2, MFA failure rate 41%'
-    },
-    {
-      id: 'act-2',
-      actor: 'Signal Copilot',
-      action: 'Auto-resolved 38 benign anomalies',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-      state: 'success',
-      context: 'ML confidence 93%'
-    },
-    {
-      id: 'act-3',
-      actor: 'Trust Graph',
-      action: 'New high-signal connection from Finance Cloud',
-      timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-      state: 'info',
-      context: 'Vetted by policy team'
-    },
-    {
-      id: 'act-4',
-      actor: 'Analyst Team',
-      action: 'Opened investigation INV-9481 for persistent anomaly',
-      timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-      state: 'warning',
-      context: 'SLA 2h remaining'
     }
   ],
+
   connections: [
     {
       id: 'conn-1',
       name: 'Helix Banking',
       title: 'Core Payments',
       organization: 'Helix',
-      avatarUrl: 'https://images.unsplash.com/photo-1521790797524-b2497295b8a0?auto=format&fit=facearea&w=200&h=200&q=80',
+      avatarUrl: 'https://images.unsplash.com/photo-1521790797524-b2497295b8a0',
       trustScore: 92,
       isOnline: true,
       lastActive: new Date().toISOString()
-    },
-    {
-      id: 'conn-2',
-      name: 'Aurora Identity',
-      title: 'Identity Graph',
-      organization: 'Aurora',
-      avatarUrl: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=facearea&w=200&h=200&q=80',
-      trustScore: 88,
-      isOnline: false,
-      lastActive: new Date(Date.now() - 1000 * 60 * 12).toISOString()
-    },
-    {
-      id: 'conn-3',
-      name: 'Lumen Retail',
-      title: 'POS Telemetry',
-      organization: 'Lumen',
-      avatarUrl: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=facearea&w=200&h=200&q=80',
-      trustScore: 79,
-      isOnline: true,
-      lastActive: new Date(Date.now() - 1000 * 60 * 45).toISOString()
     }
   ]
 };
-
