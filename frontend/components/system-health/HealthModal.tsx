@@ -125,10 +125,10 @@ export const HealthModal = ({ open, onClose, score, label, state, breakdown }: H
           Close
         </button>
         <a
-          href="/health"
+          href="/signals"
           className="rounded-[18px] bg-primary/80 px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary"
         >
-          Open Health Overview
+          View Signals
         </a>
       </div>
     </Modal>

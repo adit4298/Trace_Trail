@@ -67,7 +67,7 @@ async function fetchJson<T>(
  */
 export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
   if (!API_BASE_URL) {
-    console.warn('[api] API base URL missing, using mock dashboard');
+    // Demo mode: Silent fallback to mock data
     return mockDashboardSnapshot;
   }
 
@@ -77,7 +77,7 @@ export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
       tags: ['dashboard']
     });
   } catch (error) {
-    console.warn('[api] Dashboard API failed, using mock data', error);
+    // Demo mode: Silent fallback to mock data (no console errors)
     return mockDashboardSnapshot;
   }
 }

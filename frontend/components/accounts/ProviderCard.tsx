@@ -88,9 +88,10 @@ export const ProviderCard = ({
 }: ProviderCardProps) => {
   const config = providerConfig[provider];
   const Icon = config.icon;
-  const statusLabel = connected ? `Connected as ${username ?? email ?? '—'}` : 'Not connected';
-  // Check if API is available - NEXT_PUBLIC_ vars are available at build time in client components
-  const apiAvailable = Boolean(process.env.NEXT_PUBLIC_API_URL);
+  // Demo mode: Always show "Not connected (Demo)"
+  const statusLabel = connected ? `Connected as ${username ?? email ?? '—'}` : 'Not connected (Demo)';
+  // Demo mode: Disable API calls
+  const apiAvailable = false;
 
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-surface p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">

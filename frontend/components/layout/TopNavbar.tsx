@@ -11,22 +11,44 @@ import { useTheme } from '@/hooks/useTheme';
 
 import type { UserProfile } from '@/lib/types';
 
+// Helper function to generate user initials (demo fallback)
+const getUserInitials = (name: string): string => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
 interface TopNavbarProps {
   notifications: number;
   user: UserProfile;
 }
+
+// Demo notifications (mock data)
+const mockNotifications = [
+  { id: '1', text: 'New signal detected (demo)', time: '2m ago' },
+  { id: '2', text: 'Weekly report generated (demo)', time: '1h ago' },
+  { id: '3', text: 'System health check completed (demo)', time: '3h ago' }
+];
 
 export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
   const { toggleSidebar, isOpen: isSidebarOpen } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setProfileOpen(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -82,20 +104,46 @@ export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
             </button>
           </Tooltip>
 
-          <Tooltip content="Notifications">
+          <div className="relative" ref={notificationsRef}>
             <button
               type="button"
               className="relative rounded-2xl border border-border/60 bg-surface-muted/80 p-2 text-foreground transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-label="View notifications"
+              onClick={() => setNotificationsOpen((prev) => !prev)}
             >
               <Bell className="h-5 w-5" />
-              {notifications > 0 ? (
+              {mockNotifications.length > 0 ? (
                 <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-warning/80 text-[10px] font-semibold text-primary-foreground">
-                  {notifications}
+                  {mockNotifications.length}
                 </span>
               ) : null}
             </button>
-          </Tooltip>
+
+            {notificationsOpen ? (
+              <div
+                role="menu"
+                className="absolute right-0 mt-3 w-80 rounded-2xl border border-border/50 bg-surface p-3 text-sm text-foreground shadow-lg z-50"
+              >
+                <div className="mb-2 pb-2 border-b border-border/40">
+                  <p className="font-semibold text-foreground">Notifications (Demo)</p>
+                </div>
+                <div className="max-h-96 overflow-y-auto space-y-2">
+                  {mockNotifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className="rounded-xl border border-border/40 bg-surface-muted/60 px-3 py-2 text-xs text-foreground"
+                    >
+                      <p className="font-medium">{notif.text}</p>
+                      <p className="text-muted mt-1">{notif.time}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 pt-2 border-t border-border/40 text-center">
+                  <p className="text-xs text-muted">Demo mode: Notifications are simulated</p>
+                </div>
+              </div>
+            ) : null}
+          </div>
 
           <div className="relative" ref={profileRef}>
             <button
@@ -105,14 +153,21 @@ export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
               aria-expanded={profileOpen}
               onClick={() => setProfileOpen((prev) => !prev)}
             >
-              <span className="relative h-10 w-10 overflow-hidden rounded-2xl border border-white/10">
-                <Image
-                  src={user.avatarUrl}
-                  alt={`${user.name} avatar`}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
+              <span className="relative h-10 w-10 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-primary/20 to-primary/10">
+                {user.avatarUrl && !avatarError ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt={`${user.name} avatar`}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-foreground">
+                    {getUserInitials(user.name)}
+                  </span>
+                )}
               </span>
               <span className="hidden flex-col text-sm text-foreground sm:flex">
                 <span className="font-semibold">{user.name}</span>
@@ -129,6 +184,7 @@ export const TopNavbar = ({ notifications, user }: TopNavbarProps) => {
                   <p className="text-sm font-semibold text-foreground">{user.name}</p>
                   <p className="text-xs text-muted">{user.title}</p>
                   <p className="text-xs text-muted">{user.organization}</p>
+                  <p className="mt-2 text-[10px] uppercase tracking-wider text-primary/60">Demo Workspace</p>
                 </div>
                 <button
                   type="button"

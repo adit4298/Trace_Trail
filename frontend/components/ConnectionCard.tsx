@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { formatDistanceToNow } from 'date-fns';
 import { ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 import type { Connection } from '@/lib/types';
 
@@ -12,17 +13,26 @@ interface ConnectionCardProps {
 }
 
 export const ConnectionCard = ({ connection }: ConnectionCardProps) => {
+  const [avatarError, setAvatarError] = useState(false);
+  
   return (
     <article className="focus-ring flex flex-col gap-3 rounded-2xl border border-border/60 bg-surface p-4 shadow-soft">
       <div className="flex items-center gap-3">
-        <div className="relative h-12 w-12 overflow-hidden rounded-xl">
-          <Image
-            src={connection.avatarUrl}
-            alt={`${connection.name} logo`}
-            fill
-            sizes="48px"
-            className="object-cover"
-          />
+        <div className="relative h-12 w-12 overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
+          {connection.avatarUrl && !avatarError ? (
+            <Image
+              src={connection.avatarUrl}
+              alt={`${connection.name} logo`}
+              fill
+              sizes="48px"
+              className="object-cover"
+              onError={() => setAvatarError(true)}
+            />
+          ) : (
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-foreground">
+              {connection.name.substring(0, 2).toUpperCase()}
+            </span>
+          )}
           <span
             className={clsx(
               'absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border border-surface',

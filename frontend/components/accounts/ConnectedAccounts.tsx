@@ -1,16 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
-import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
   PROVIDERS,
-  disconnectAccount,
-  getAccounts,
-  getOAuthRedirectUrl,
-  syncAll,
-  syncProvider,
   type AccountConnection,
   type Provider
 } from '@/services/accountService';
@@ -40,91 +35,58 @@ const buildActionState = () =>
   );
 
 export const ConnectedAccounts = () => {
-  const [accounts, setAccounts] = useState<AccountConnection[]>(initialState);
-  const [loading, setLoading] = useState(true);
-  const [syncingAll, setSyncingAll] = useState(false);
+  // Demo mode: Always use initial state, no API calls
+  const [accounts] = useState<AccountConnection[]>(initialState);
+  const [loading] = useState(false);
+  const [syncingAll] = useState(false);
   const [actions, setActions] = useState<Record<Provider, 'connect' | 'disconnect' | 'sync' | null>>(buildActionState);
-  const [error, setError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
+  // Demo mode: Skip API calls
   const loadAccounts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getAccounts();
-      setAccounts(data);
-    } catch {
-      // Don't show error on initial load - just use default disconnected state
-      // Only show error for user-initiated actions
-      setAccounts(initialState);
-    } finally {
-      setLoading(false);
-    }
+    // Silent fallback - no API calls in demo mode
   }, []);
 
   useEffect(() => {
-    void loadAccounts();
-  }, [loadAccounts]);
+    // Demo mode: Skip initial load
+  }, []);
 
   const setProviderAction = (provider: Provider, action: 'connect' | 'disconnect' | 'sync' | null) => {
     setActions((prev) => ({ ...prev, [provider]: action }));
   };
 
+  // Demo mode: Show toast instead of API calls
   const handleConnect = async (provider: Provider) => {
-    try {
-      setProviderAction(provider, 'connect');
-      setError(null);
-      const url = await getOAuthRedirectUrl(provider);
-      if (!url || url.trim() === '') {
-        throw new Error('OAuth integration not available. Please configure OAuth credentials in the backend.');
-      }
-      window.location.href = url;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unable to initiate OAuth flow';
-      setError(errorMessage);
+    setProviderAction(provider, 'connect');
+    setTimeout(() => {
       setProviderAction(provider, null);
-      // Clear error after 5 seconds
-      setTimeout(() => setError(null), 5000);
-    }
+      setInfoMessage(`OAuth flow disabled in demo mode. In production, this would redirect to ${providerLabels[provider]} OAuth.`);
+      setTimeout(() => setInfoMessage(null), 5000);
+    }, 800);
   };
 
   const handleDisconnect = async (provider: Provider) => {
-    try {
-      setProviderAction(provider, 'disconnect');
-      await disconnectAccount(provider);
-      await loadAccounts();
-      setInfoMessage(`${providerLabels[provider]} disconnected.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to disconnect account');
-    } finally {
+    setProviderAction(provider, 'disconnect');
+    setTimeout(() => {
       setProviderAction(provider, null);
-    }
+      setInfoMessage(`${providerLabels[provider]} disconnect disabled in demo mode.`);
+      setTimeout(() => setInfoMessage(null), 3000);
+    }, 500);
   };
 
   const handleSyncProvider = async (provider: Provider) => {
-    try {
-      setProviderAction(provider, 'sync');
-      await syncProvider(provider);
-      await loadAccounts();
-      setInfoMessage(`${providerLabels[provider]} synced just now.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sync failed');
-    } finally {
+    setProviderAction(provider, 'sync');
+    setTimeout(() => {
       setProviderAction(provider, null);
-    }
+      setInfoMessage(`${providerLabels[provider]} sync disabled in demo mode.`);
+      setTimeout(() => setInfoMessage(null), 3000);
+    }, 800);
   };
 
   const handleSyncAll = async () => {
-    try {
-      setSyncingAll(true);
-      await syncAll();
-      await loadAccounts();
-      setInfoMessage('Accounts queued for refresh.');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to sync all accounts');
-    } finally {
-      setSyncingAll(false);
-    }
+    // Demo mode: No-op
+    setInfoMessage('Sync all disabled in demo mode.');
+    setTimeout(() => setInfoMessage(null), 3000);
   };
 
   return (
@@ -148,42 +110,34 @@ export const ConnectedAccounts = () => {
         </button>
       </header>
 
-      {error ? (
-        <div className="flex items-center gap-3 rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-          <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      ) : null}
+      {/* Demo mode banner */}
+      <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground">
+        <span className="text-primary">ℹ️</span>
+        <span className="text-muted">Demo mode: Account connections are simulated.</span>
+      </div>
 
       {infoMessage ? (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-primary">{infoMessage}</div>
       ) : null}
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-border/60 bg-surface p-8 text-sm text-muted">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          Loading account status...
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {accounts.map((account) => (
-            <ProviderCard
-              key={account.provider}
-              provider={account.provider}
-              connected={account.connected}
-              username={account.username}
-              email={account.email}
-              lastSyncedAt={account.lastSyncedAt}
-              onConnect={() => handleConnect(account.provider)}
-              onDisconnect={() => handleDisconnect(account.provider)}
-              onSync={() => handleSyncProvider(account.provider)}
-              isConnecting={actions[account.provider] === 'connect'}
-              isDisconnecting={actions[account.provider] === 'disconnect'}
-              isSyncing={actions[account.provider] === 'sync'}
-            />
-          ))}
-        </div>
-      )}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {accounts.map((account) => (
+          <ProviderCard
+            key={account.provider}
+            provider={account.provider}
+            connected={account.connected}
+            username={account.username}
+            email={account.email}
+            lastSyncedAt={account.lastSyncedAt}
+            onConnect={() => handleConnect(account.provider)}
+            onDisconnect={() => handleDisconnect(account.provider)}
+            onSync={() => handleSyncProvider(account.provider)}
+            isConnecting={actions[account.provider] === 'connect'}
+            isDisconnecting={actions[account.provider] === 'disconnect'}
+            isSyncing={actions[account.provider] === 'sync'}
+          />
+        ))}
+      </div>
     </section>
   );
 };

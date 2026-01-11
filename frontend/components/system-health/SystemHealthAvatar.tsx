@@ -53,18 +53,24 @@ export const SystemHealthAvatar = ({
           'max-lg:hidden' // Hide on mobile/tablet to prevent layout issues
         )}
       >
-        <button
-          type="button"
+        <div
           className={clsx(
-            'pointer-events-auto relative flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-3 text-xs text-foreground shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1',
+            'pointer-events-auto relative flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-3 text-xs text-foreground shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1 cursor-pointer',
             status.glow
           )}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          onFocus={() => setHovered(true)}
-          onBlur={() => setHovered(false)}
           onClick={openModal}
-          aria-label="System health status"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openModal();
+            }
+          }}
+          aria-label="System health status - Click to view details"
+          title="System health monitoring - Click to view details"
         >
           <div className="relative">
             <HealthStateRing size={size} ringClass={status.ringClass} state={status.state} />
@@ -89,7 +95,7 @@ export const SystemHealthAvatar = ({
             toneClass={status.tooltipTone}
             onOpenDetails={openModal}
           />
-        </button>
+        </div>
       </div>
 
       <HealthModal

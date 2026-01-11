@@ -32,7 +32,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft backdrop-blur" aria-label="Greeting">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -79,7 +79,8 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
 
         <div className="mt-6 rounded-2xl border border-white/5 bg-white/5 px-6 py-4 text-sm text-foreground">
           <p className="text-muted">
-            Connect your accounts to enable insights. Visit{' '}
+            {/* Demo placeholder: Connect accounts message */}
+            Data will appear once accounts are connected. Visit{' '}
             <a href="/dashboard/accounts" className="text-primary hover:underline">
               Connected Accounts
             </a>{' '}
@@ -87,7 +88,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
           </p>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2" id="onboarding-account-benefits">
+        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4" id="onboarding-account-benefits">
           {['Insights intelligence', 'Telemetry coverage', 'Footprint tracking', 'Live signals'].map((item) => (
             <div
               key={item}
@@ -100,7 +101,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         </div>
       </section>
 
-      <section aria-label="Key metrics" className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Key metrics" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {snapshot.metrics.map((metric) => (
           <MetricCard
             key={metric.id}
@@ -111,7 +112,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <TrendChart series={snapshot.trends} range={chartRange} onRangeChange={setChartRange} />
         <LiveActivityList activities={snapshot.activities} onSelect={setSelectedActivity} />
       </section>
@@ -124,7 +125,8 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         onClose={() => setSelectedActivity(null)}
       />
 
-      <section id="onboarding-health-section">
+      <section id="onboarding-health-section" className="relative min-h-[120px]">
+        {/* Demo: System health avatar positioned absolutely */}
         <SystemHealthAvatar
           score={healthScore}
           updatedAt={new Date()}
@@ -132,7 +134,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         />
       </section>
 
-      <footer className="pt-2 text-center text-xs text-muted/80">© 2025 TraceTrail — Security Companion</footer>
+      <footer className="pt-4 text-center text-xs text-muted/80">© 2025 TraceTrail — Security Companion</footer>
     </div>
   );
 };
