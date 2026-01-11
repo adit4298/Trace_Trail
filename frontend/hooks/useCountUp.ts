@@ -14,11 +14,27 @@ export const useCountUp = (
   target: number,
   { duration = 1400, start = 0, easing = easeOutCubic }: UseCountUpOptions = {}
 ) => {
-  const [value, setValue] = useState(start);
-  const frameRef = useRef<number>();
+  /**
+   * IMPORTANT:
+   * - Server render MUST match first client render
+   * - So we start at the FINAL value (target)
+   * - Animation only runs after hydration
+   */
+  const [value, setValue] = useState<number>(target);
+  const frameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent animation during SSR + first hydration pass
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      setValue(target);
+      return;
+    }
+
+    startTimeRef.current = null;
+
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
         startTimeRef.current = timestamp;
@@ -39,14 +55,11 @@ export const useCountUp = (
     frameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (frameRef.current) {
+      if (frameRef.current !== null) {
         cancelAnimationFrame(frameRef.current);
       }
-      startTimeRef.current = null;
     };
   }, [target, duration, start, easing]);
 
   return value;
 };
-
-

@@ -25,6 +25,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
   const riskMetric = snapshot.metrics.find((metric) => metric.id === 'risk-score');
   const healthScore = riskMetric ? parseFloat(riskMetric.value) : 42;
   const healthBreakdown = useHealthBreakdown(snapshot.metrics, snapshot.trends);
+
   const quickActions = [
     { id: 'link', label: 'Link Accounts', helper: 'Connect Google, Meta, X', href: '/dashboard/accounts' },
     { id: 'insights', label: 'View Insights', helper: 'Monitor anomalies', href: '/insights' },
@@ -33,10 +34,11 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft backdrop-blur" aria-label="Greeting">
+      {/* Greeting */}
+      <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft backdrop-blur">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-primary/80">Welcome back 👋</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-primary/80">Welcome back</p>
             <h1 className="mt-2 text-3xl font-semibold text-foreground">Your Security Companion</h1>
             <p className="mt-2 text-base text-muted">
               Keep your digital footprint safe with live telemetry, human-friendly insights, and always-on monitoring.
@@ -48,7 +50,7 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
               <a
                 key={action.id}
                 href={action.href}
-                className="min-w-[160px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-foreground transition hover:border-white/30 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="min-w-[160px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-foreground transition hover:border-white/30 hover:bg-white/10"
               >
                 <span className="block font-semibold">{action.label}</span>
                 <span className="text-xs text-muted">{action.helper}</span>
@@ -58,11 +60,8 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         </div>
       </section>
 
-      <section
-        id="onboarding-accounts-section"
-        className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft"
-        aria-label="Accounts overview"
-      >
+      {/* Accounts overview */}
+      <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft">
         <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted/70">Accounts Overview</p>
@@ -71,28 +70,21 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
           </div>
           <a
             href="/dashboard/accounts"
-            className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary transition hover:bg-primary/20"
+            className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary hover:bg-primary/20"
           >
             Manage Accounts
           </a>
         </header>
 
-        <div className="mt-6 rounded-2xl border border-white/5 bg-white/5 px-6 py-4 text-sm text-foreground">
-          <p className="text-muted">
-            {/* Demo placeholder: Connect accounts message */}
-            Data will appear once accounts are connected. Visit{' '}
-            <a href="/dashboard/accounts" className="text-primary hover:underline">
-              Connected Accounts
-            </a>{' '}
-            to get started.
-          </p>
+        <div className="mt-6 rounded-2xl border border-white/5 bg-white/5 px-6 py-4 text-sm text-muted">
+          Data will appear once accounts are connected.
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4" id="onboarding-account-benefits">
+        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {['Insights intelligence', 'Telemetry coverage', 'Footprint tracking', 'Live signals'].map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-white/5 bg-surface-muted/60 px-4 py-3 text-sm text-foreground"
+              className="rounded-2xl border border-white/5 bg-surface-muted/60 px-4 py-3 text-sm"
             >
               <p className="font-semibold">{item}</p>
               <p className="text-xs text-muted">Powered by your connected accounts.</p>
@@ -101,7 +93,17 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         </div>
       </section>
 
-      <section aria-label="Key metrics" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* Metrics + Health avatar (FIXED) */}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {/* System health avatar now lives IN the grid */}
+        <div className="xl:col-span-1">
+          <SystemHealthAvatar
+            score={healthScore}
+            updatedAt={new Date()}
+            breakdown={healthBreakdown}
+          />
+        </div>
+
         {snapshot.metrics.map((metric) => (
           <MetricCard
             key={metric.id}
@@ -117,24 +119,12 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
         <LiveActivityList activities={snapshot.activities} onSelect={setSelectedActivity} />
       </section>
 
-      <MetricDetailPanel metric={selectedMetric} open={Boolean(selectedMetric)} onClose={() => setSelectedMetric(null)} />
+      <MetricDetailPanel metric={selectedMetric} open={!!selectedMetric} onClose={() => setSelectedMetric(null)} />
+      <ActivityDetailDrawer activity={selectedActivity} open={!!selectedActivity} onClose={() => setSelectedActivity(null)} />
 
-      <ActivityDetailDrawer
-        activity={selectedActivity}
-        open={Boolean(selectedActivity)}
-        onClose={() => setSelectedActivity(null)}
-      />
-
-      <section id="onboarding-health-section" className="relative min-h-[120px]">
-        {/* Demo: System health avatar positioned absolutely */}
-        <SystemHealthAvatar
-          score={healthScore}
-          updatedAt={new Date()}
-          breakdown={healthBreakdown}
-        />
-      </section>
-
-      <footer className="pt-4 text-center text-xs text-muted/80">© 2025 TraceTrail — Security Companion</footer>
+      <footer className="pt-4 text-center text-xs text-muted/80">
+        © 2025 TraceTrail — Security Companion
+      </footer>
     </div>
   );
 };
@@ -143,22 +133,22 @@ const useHealthBreakdown = (metrics: MetricSummary[], trends: TrendSeries) =>
   useMemo(() => {
     const anomalies = trends.data.at(-1)?.value ?? 24;
     const criticalAlerts = parseValue(metrics.find((m) => m.id === 'alerts')?.value ?? '12');
-    const coverage = parseValue(metrics.find((m) => m.id === 'coverage')?.value ?? '0.86') / 100;
+    const coverage = parseValue(metrics.find((m) => m.id === 'coverage')?.value ?? '86') / 100;
     const signalVolume = parseValue(metrics.find((m) => m.id === 'signals')?.value ?? '120k');
 
     return {
       anomalies,
       criticalAlerts,
-      coverage: Number.isFinite(coverage) ? coverage : 0.86,
+      coverage,
       signalVolume,
-      trend: trends.data.slice(-10).map((point) => point.value),
+      trend: trends.data.slice(-10).map((p) => p.value),
       recommendations: [
-        'Give the APAC login spike a quick look to confirm it was you.',
-        'Let Signal Copilot auto-triage lower confidence events to save time.',
-        'Extend device coverage to a few older laptops in EMEA for extra confidence.'
+        'Give the APAC login spike a quick look.',
+        'Let Signal Copilot auto-triage lower confidence events.',
+        'Extend device coverage in EMEA.'
       ]
     };
-  }, [metrics, trends.data]);
+  }, [metrics, trends]);
 
 const parseValue = (value: string) => {
   const match = value.match(/^([\d.]+)\s*(k|m|%)?/i);
@@ -167,8 +157,5 @@ const parseValue = (value: string) => {
   const unit = match[2]?.toLowerCase();
   if (unit === 'k') return base * 1_000;
   if (unit === 'm') return base * 1_000_000;
-  if (unit === '%') return base;
   return base;
 };
-
-

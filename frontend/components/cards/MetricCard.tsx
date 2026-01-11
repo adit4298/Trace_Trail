@@ -12,9 +12,10 @@ import {
   Radar,
   ShieldCheck
 } from 'lucide-react';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 
 import { Tooltip } from '@/components/ui/Tooltip';
+import { useCountUp } from '@/hooks/useCountUp';
 import type { MetricSummary } from '@/lib/types';
 
 interface MetricCardProps {
@@ -44,17 +45,39 @@ const metricCopyFallback: Record<string, string> = {
   alerts: 'Items waiting for a quick review.'
 };
 
-const getSparkline = (id: string) =>
-  sparklineMap[id] ?? [14, 16, 15, 18, 17, 19, 20, 22];
-
-const formatValue = (value: string) => {
+const splitValue = (value: string) => {
   const match = value.match(/^([\d.,]+)\s*(.*)$/);
-  if (!match) return value;
-  return `${match[1]}${match[2] ? ` ${match[2]}` : ''}`;
+  if (!match) return { numeric: 0, suffix: '' };
+
+  return {
+    numeric: Number(match[1].replace(/,/g, '')),
+    suffix: match[2]
+  };
 };
 
 export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
-  const formattedValue = useMemo(() => formatValue(metric.value), [metric.value]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const { numeric, suffix } = useMemo(
+    () => splitValue(metric.value),
+    [metric.value]
+  );
+
+  // 🚨 CRITICAL: animation ONLY after mount
+  const animatedValue = mounted ? useCountUp(numeric) : numeric;
+
+  const formattedValue = useMemo(() => {
+    if (!mounted) return numeric.toString(); // SSR-safe
+
+    if (suffix.trim() === 'k') return `${animatedValue.toFixed(0)}k`;
+    if (suffix.includes('%')) return `${animatedValue.toFixed(1)}%`;
+
+    return animatedValue.toFixed(Number.isInteger(numeric) ? 0 : 1);
+  }, [animatedValue, mounted, numeric, suffix]);
 
   const changeTone =
     metric.trend === 'up'
@@ -71,7 +94,7 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
         : Minus;
 
   const clampedProgress = Math.min(1, Math.max(0, metric.progress));
-  const sparkline = useMemo(() => getSparkline(metric.id), [metric.id]);
+  const sparkline = sparklineMap[metric.id] ?? [];
   const MetricIcon = metricIconMap[metric.id] ?? Lock;
   const helperCopy =
     metric.annotation ??
@@ -81,15 +104,14 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
   return (
     <button
       type="button"
-      aria-pressed={isActive}
       onClick={() => onSelect?.(metric)}
+      aria-pressed={isActive}
       className={clsx(
-        'group relative flex flex-col gap-5 rounded-[18px] border border-border/60 bg-surface p-5 text-left shadow-[0_16px_35px_rgba(7,9,12,0.35)] transition',
-        'hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(7,9,12,0.38)]',
+        'group relative flex flex-col gap-5 rounded-[18px] border border-border/60 bg-surface p-5 text-left shadow transition',
         isActive && 'ring-2 ring-primary/50'
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <MetricIcon className="h-5 w-5" />
@@ -100,10 +122,10 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
           </div>
         </div>
 
-        <Tooltip content={metric.status ?? 'Last 24h trend'}>
+        <Tooltip content={metric.status ?? 'Last 24h'}>
           <span
             className={clsx(
-              'inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold',
+              'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold',
               changeTone
             )}
           >
@@ -114,32 +136,16 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
         </Tooltip>
       </div>
 
-      <div className="flex items-end justify-between">
-        <p className="text-4xl font-semibold tracking-tight">
-          {formattedValue}
-        </p>
-        {metric.status && <p className="text-sm text-muted">{metric.status}</p>}
+      <p className="text-4xl font-semibold">{formattedValue}</p>
+
+      <div className="h-1.5 w-full rounded-full bg-surface-muted overflow-hidden">
+        <span
+          className="block h-full bg-primary transition-all"
+          style={{ width: `${clampedProgress * 100}%` }}
+        />
       </div>
 
-      <div className="space-y-3">
-        <div className="relative h-1.5 w-full rounded-full bg-surface-muted">
-          <span
-            className={clsx(
-              'absolute inset-y-0 rounded-full bg-primary',
-              metric.trend === 'down' && 'bg-danger'
-            )}
-            style={{ width: `${clampedProgress * 100}%` }}
-          />
-        </div>
-        <MiniSparkline data={sparkline} trend={metric.trend} />
-      </div>
-
-      <div className="flex items-center justify-between text-xs text-muted">
-        <span>Target {metric.target.toLocaleString()}</span>
-        <span className="inline-flex items-center gap-1 text-primary">
-          Details <ArrowRight className="h-3 w-3" />
-        </span>
-      </div>
+      <MiniSparkline data={sparkline} trend={metric.trend} />
     </button>
   );
 };
@@ -150,25 +156,24 @@ interface MiniSparklineProps {
 }
 
 const MiniSparkline = memo(({ data, trend }: MiniSparklineProps) => {
+  if (!data.length) return null;
+
   const max = Math.max(...data);
   const min = Math.min(...data);
-  const points = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = ((v - min) / (max - min || 1)) * 50;
-    return `${x},${50 - y}`;
-  });
+  const points = data
+    .map((v, i) => `${(i / (data.length - 1)) * 100},${50 - ((v - min) / (max - min || 1)) * 50}`)
+    .join(' ');
 
-  const stroke =
+  const color =
     trend === 'down' ? '#D9534F' : trend === 'up' ? '#47B0E7' : '#6B7685';
 
   return (
     <svg viewBox="0 0 100 50" className="h-16 w-full">
       <polyline
-        points={points.join(' ')}
+        points={points}
         fill="none"
-        stroke={stroke}
-        strokeWidth={2.3}
-        strokeLinecap="round"
+        stroke={color}
+        strokeWidth={2}
       />
     </svg>
   );
