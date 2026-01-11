@@ -14,46 +14,35 @@ interface SystemHealthAvatarProps {
   size?: number;
   updatedAt: Date;
   breakdown: HealthBreakdown;
-  onOpenDetails?: () => void;
 }
 
 export const SystemHealthAvatar = ({
   score,
-  size = 80,
+  size = 96,
   updatedAt,
-  breakdown,
-  onOpenDetails
+  breakdown
 }: SystemHealthAvatarProps) => {
   const [hovered, setHovered] = useState(false);
   const [open, setOpen] = useState(false);
   const status = useHealthStatus(score);
 
-  const openModal = () => {
-    setOpen(true);
-    onOpenDetails?.();
-  };
-
   return (
     <>
-      <div className="flex justify-center">
+      {/* NORMAL FLOW CONTAINER — NOT FLOATING */}
+      <div className="relative flex w-full justify-center">
         <div
           className={clsx(
-            'relative flex flex-col items-center gap-2 rounded-[24px] border border-border/60 bg-surface p-4 text-xs text-foreground',
-            'shadow-[0_18px_45px_rgba(10,12,15,0.35)] transition hover:-translate-y-1 cursor-pointer',
+            'relative flex flex-col items-center gap-2 rounded-[24px]',
+            'border border-border/60 bg-surface p-4 text-xs text-foreground',
+            'shadow-[0_18px_45px_rgba(10,12,15,0.35)]',
+            'transition hover:-translate-y-0.5 cursor-pointer',
             status.glow
           )}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          onClick={openModal}
+          onClick={() => setOpen(true)}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              openModal();
-            }
-          }}
-          aria-label="System health status"
         >
           <div className="relative">
             <HealthStateRing size={size} ringClass={status.ringClass} state={status.state} />
@@ -63,7 +52,7 @@ export const SystemHealthAvatar = ({
               glowClass={status.glow}
               pulseClass={status.pulseClass}
             />
-            <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-foreground drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+            <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold">
               {Math.round(score)}
             </span>
           </div>
@@ -80,7 +69,7 @@ export const SystemHealthAvatar = ({
             description={status.description}
             updatedAt={updatedAt}
             toneClass={status.tooltipTone}
-            onOpenDetails={openModal}
+            onOpenDetails={() => setOpen(true)}
           />
         </div>
       </div>

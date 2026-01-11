@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import {
   AlertTriangle,
   ArrowDownRight,
-  ArrowRight,
   ArrowUpRight,
   Fingerprint,
   Lock,
@@ -47,7 +46,9 @@ const metricCopyFallback: Record<string, string> = {
 
 const splitValue = (value: string) => {
   const match = value.match(/^([\d.,]+)\s*(.*)$/);
-  if (!match) return { numeric: 0, suffix: '' };
+  if (!match) {
+    return { numeric: 0, suffix: '' };
+  }
 
   return {
     numeric: Number(match[1].replace(/,/g, '')),
@@ -67,17 +68,17 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
     [metric.value]
   );
 
-  // 🚨 CRITICAL: animation ONLY after mount
-  const animatedValue = mounted ? useCountUp(numeric) : numeric;
+  // ✅ Hook is ALWAYS called
+  const animatedValue = useCountUp(numeric);
+
+  // ✅ We decide what to DISPLAY, not what hook to call
+  const displayValue = mounted ? animatedValue : numeric;
 
   const formattedValue = useMemo(() => {
-    if (!mounted) return numeric.toString(); // SSR-safe
-
-    if (suffix.trim() === 'k') return `${animatedValue.toFixed(0)}k`;
-    if (suffix.includes('%')) return `${animatedValue.toFixed(1)}%`;
-
-    return animatedValue.toFixed(Number.isInteger(numeric) ? 0 : 1);
-  }, [animatedValue, mounted, numeric, suffix]);
+    if (suffix.trim() === 'k') return `${displayValue.toFixed(0)}k`;
+    if (suffix.includes('%')) return `${displayValue.toFixed(1)}%`;
+    return displayValue.toFixed(Number.isInteger(numeric) ? 0 : 1);
+  }, [displayValue, numeric, suffix]);
 
   const changeTone =
     metric.trend === 'up'
@@ -138,7 +139,7 @@ export const MetricCard = ({ metric, onSelect, isActive }: MetricCardProps) => {
 
       <p className="text-4xl font-semibold">{formattedValue}</p>
 
-      <div className="h-1.5 w-full rounded-full bg-surface-muted overflow-hidden">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-muted">
         <span
           className="block h-full bg-primary transition-all"
           style={{ width: `${clampedProgress * 100}%` }}
@@ -161,7 +162,10 @@ const MiniSparkline = memo(({ data, trend }: MiniSparklineProps) => {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const points = data
-    .map((v, i) => `${(i / (data.length - 1)) * 100},${50 - ((v - min) / (max - min || 1)) * 50}`)
+    .map(
+      (v, i) =>
+        `${(i / (data.length - 1)) * 100},${50 - ((v - min) / (max - min || 1)) * 50}`
+    )
     .join(' ');
 
   const color =
@@ -169,12 +173,7 @@ const MiniSparkline = memo(({ data, trend }: MiniSparklineProps) => {
 
   return (
     <svg viewBox="0 0 100 50" className="h-16 w-full">
-      <polyline
-        points={points}
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-      />
+      <polyline points={points} fill="none" stroke={color} strokeWidth={2} />
     </svg>
   );
 });

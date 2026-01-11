@@ -38,10 +38,15 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
       <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft backdrop-blur">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-primary/80">Welcome back</p>
-            <h1 className="mt-2 text-3xl font-semibold text-foreground">Your Security Companion</h1>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-primary/80">
+              Welcome back
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">
+              Your Security Companion
+            </h1>
             <p className="mt-2 text-base text-muted">
-              Keep your digital footprint safe with live telemetry, human-friendly insights, and always-on monitoring.
+              Keep your digital footprint safe with live telemetry, human-friendly insights,
+              and always-on monitoring.
             </p>
           </div>
 
@@ -64,10 +69,17 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
       <section className="rounded-3xl border border-white/5 bg-surface/70 p-6 shadow-soft">
         <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted/70">Accounts Overview</p>
-            <h2 className="text-xl font-semibold text-foreground">Manage and sync your connected platforms.</h2>
-            <p className="text-sm text-muted">Each linked account unlocks richer insights and better coverage.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-muted/70">
+              Accounts Overview
+            </p>
+            <h2 className="text-xl font-semibold text-foreground">
+              Manage and sync your connected platforms.
+            </h2>
+            <p className="text-sm text-muted">
+              Each linked account unlocks richer insights and better coverage.
+            </p>
           </div>
+
           <a
             href="/dashboard/accounts"
             className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary hover:bg-primary/20"
@@ -87,16 +99,18 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
               className="rounded-2xl border border-white/5 bg-surface-muted/60 px-4 py-3 text-sm"
             >
               <p className="font-semibold">{item}</p>
-              <p className="text-xs text-muted">Powered by your connected accounts.</p>
+              <p className="text-xs text-muted">
+                Powered by your connected accounts.
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Metrics + Health avatar (FIXED) */}
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        {/* System health avatar now lives IN the grid */}
-        <div className="xl:col-span-1">
+      {/* Metrics + System Health (CORRECT) */}
+      <section className="relative">
+        {/* Floating avatar – NOT in grid */}
+        <div className="absolute left-0 top-0 z-20">
           <SystemHealthAvatar
             score={healthScore}
             updatedAt={new Date()}
@@ -104,23 +118,43 @@ export const DashboardOverview = ({ snapshot }: DashboardOverviewProps) => {
           />
         </div>
 
-        {snapshot.metrics.map((metric) => (
-          <MetricCard
-            key={metric.id}
-            metric={metric}
-            onSelect={setSelectedMetric}
-            isActive={selectedMetric?.id === metric.id}
-          />
-        ))}
+        {/* Metrics grid – untouched layout */}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 pl-[220px]">
+          {snapshot.metrics.map((metric) => (
+            <MetricCard
+              key={metric.id}
+              metric={metric}
+              onSelect={setSelectedMetric}
+              isActive={selectedMetric?.id === metric.id}
+            />
+          ))}
+        </div>
       </section>
 
+      {/* Charts + activity */}
       <section className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <TrendChart series={snapshot.trends} range={chartRange} onRangeChange={setChartRange} />
-        <LiveActivityList activities={snapshot.activities} onSelect={setSelectedActivity} />
+        <TrendChart
+          series={snapshot.trends}
+          range={chartRange}
+          onRangeChange={setChartRange}
+        />
+        <LiveActivityList
+          activities={snapshot.activities}
+          onSelect={setSelectedActivity}
+        />
       </section>
 
-      <MetricDetailPanel metric={selectedMetric} open={!!selectedMetric} onClose={() => setSelectedMetric(null)} />
-      <ActivityDetailDrawer activity={selectedActivity} open={!!selectedActivity} onClose={() => setSelectedActivity(null)} />
+      <MetricDetailPanel
+        metric={selectedMetric}
+        open={Boolean(selectedMetric)}
+        onClose={() => setSelectedMetric(null)}
+      />
+
+      <ActivityDetailDrawer
+        activity={selectedActivity}
+        open={Boolean(selectedActivity)}
+        onClose={() => setSelectedActivity(null)}
+      />
 
       <footer className="pt-4 text-center text-xs text-muted/80">
         © 2025 TraceTrail — Security Companion

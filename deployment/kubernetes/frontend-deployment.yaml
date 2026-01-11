@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 027551668461.dkr.ecr.ap-southeast-2.amazonaws.com/tracettrail-frontend:demo
+          image: 027551668461.dkr.ecr.ap-southeast-2.amazonaws.com/tracettrail-frontend:demo-2026
           imagePullPolicy: Always
 
           env:
