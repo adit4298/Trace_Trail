@@ -887,6 +887,12 @@ input:where([type='file']):focus {
 .top-full {
   top: 100%;
 }
+.bottom-6 {
+  bottom: 1.5rem;
+}
+.left-6 {
+  left: 1.5rem;
+}
 .-z-10 {
   z-index: -10;
 }
@@ -1092,11 +1098,11 @@ input:where([type='file']):focus {
 .w-full {
   width: 100%;
 }
-.min-w-\[160px\] {
-  min-width: 160px;
-}
 .min-w-\[20px\] {
   min-width: 20px;
+}
+.min-w-\[160px\] {
+  min-width: 160px;
 }
 .max-w-2xl {
   max-width: 42rem;
@@ -1348,6 +1354,9 @@ input:where([type='file']):focus {
 }
 .items-baseline {
   align-items: baseline;
+}
+.items-stretch {
+  align-items: stretch;
 }
 .justify-center {
   justify-content: center;
@@ -1645,9 +1654,6 @@ input:where([type='file']):focus {
 .bg-surface\/60 {
   background-color: rgb(var(--color-surface) / 0.6);
 }
-.bg-surface\/70 {
-  background-color: rgb(var(--color-surface) / 0.7);
-}
 .bg-surface\/95 {
   background-color: rgb(var(--color-surface) / 0.95);
 }
@@ -1674,6 +1680,9 @@ input:where([type='file']):focus {
 }
 .bg-white\/90 {
   background-color: rgb(255 255 255 / 0.9);
+}
+.bg-surface\/70 {
+  background-color: rgb(var(--color-surface) / 0.7);
 }
 .bg-\[radial-gradient\(circle_at_30\%_25\%\2c rgba\(255\2c 255\2c 255\2c 0\.7\)\2c rgba\(255\2c 255\2c 255\2c 0\)\)\] {
   background-image: radial-gradient(circle at 30% 25%,rgba(255,255,255,0.7),rgba(255,255,255,0));
@@ -1864,9 +1873,6 @@ input:where([type='file']):focus {
 .pl-6 {
   padding-left: 1.5rem;
 }
-.pl-\[220px\] {
-  padding-left: 220px;
-}
 .pr-1 {
   padding-right: 0.25rem;
 }
@@ -1878,6 +1884,9 @@ input:where([type='file']):focus {
 }
 .pt-2 {
   padding-top: 0.5rem;
+}
+.pl-\[220px\] {
+  padding-left: 220px;
 }
 .pt-4 {
   padding-top: 1rem;
@@ -2016,9 +2025,6 @@ input:where([type='file']):focus {
 .text-muted\/70 {
   color: rgb(var(--color-muted) / 0.7);
 }
-.text-muted\/80 {
-  color: rgb(var(--color-muted) / 0.8);
-}
 .text-primary {
   --tw-text-opacity: 1;
   color: rgb(var(--color-primary) / var(--tw-text-opacity, 1));
@@ -2052,6 +2058,9 @@ input:where([type='file']):focus {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+.text-muted\/80 {
+  color: rgb(var(--color-muted) / 0.8);
 }
 .underline-offset-4 {
   text-underline-offset: 4px;
@@ -2498,12 +2507,12 @@ input:where([type='file']):focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .lg\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
   .lg\:grid-cols-\[minmax\(0\2c 2fr\)_minmax\(0\2c 1fr\)\] {
     grid-template-columns: minmax(0,2fr) minmax(0,1fr);
+  }
+
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .lg\:flex-row {
@@ -2535,12 +2544,28 @@ input:where([type='file']):focus {
 
 @media (min-width: 1280px) {
 
+  .xl\:max-w-\[220px\] {
+    max-width: 220px;
+  }
+
   .xl\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .xl\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-\[220px_repeat\(4\2c minmax\(0\2c 1fr\)\)\] {
+    grid-template-columns: 220px repeat(4,minmax(0,1fr));
+  }
+
+  .xl\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .xl\:justify-start {
+    justify-content: flex-start;
   }
 }
 
