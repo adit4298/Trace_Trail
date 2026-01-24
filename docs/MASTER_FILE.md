@@ -222,10 +222,22 @@ This version of TraceTrail uses **demo data** due to security, privacy, and inte
    - Activity logs
 
 4. **AI Module (Optional)**
-   - Risk scoring algorithms
-   - Anomaly detection models
-   - Recommendation generation
-   - Trend analysis
+   - **Location**: `ai_module/`
+   - **Status**: Development/Testing
+   - **Framework**: FastAPI (standalone service, port 8100)
+   - **Risk Scoring**: Weighted aggregation of Social Media Risk, Data Exposure Risk, and Privacy Settings Risk (0-100 scale)
+   - **Anomaly Detection**: Statistical thresholds or tree-based models for unusual pattern detection
+   - **Recommendation Engine**: Template-based recommendations with impact scoring
+   - **Trend Analysis**: Data trend analysis over time
+   - **Configuration**: Weights and thresholds in `config/model_config.json`
+   - **Notebooks**: Jupyter notebooks for exploration, development, testing, and analysis
+
+5. **Chrome Extension (Optional)**
+   - **Location**: `chrome_extension/`
+   - **Status**: Optional, for future telemetry collection
+   - **Framework**: Chrome Manifest V3 (TypeScript)
+   - **Purpose**: Capture live browsing signals and stream to backend
+   - **Integration**: REST API or WebSocket (`/ws/extension` when enabled)
 
 ---
 
@@ -379,15 +391,50 @@ backend/
 
 ### Environment Variables
 
-**Frontend (Vercel)**:
+#### Frontend Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `NEXT_PUBLIC_API_URL` | REST API base URL | `https://api.tracetrail.in` |
+| `NEXT_PUBLIC_WS_URL` | WebSocket base URL (optional) | `wss://api.tracetrail.in` |
+
+**Production (Vercel)**:
 - `NEXT_PUBLIC_API_URL=https://api.tracetrail.in`
 
-**Backend (Render)**:
-- `DATABASE_URL` - PostgreSQL connection string
-- `JWT_SECRET_KEY` - JWT signing key
-- `ENCRYPTION_KEY` - Token encryption key
-- `CORS_ORIGINS` - Allowed frontend origins
-- OAuth client credentials (if configured)
+**Local Development**:
+- `NEXT_PUBLIC_API_URL=http://localhost:8000`
+
+#### Backend Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql+psycopg://user:pass@host:5432/db` |
+| `JWT_SECRET_KEY` | JWT signing secret (32+ characters) | `<secret>` |
+| `ENCRYPTION_KEY` | Token encryption key (Fernet) | `<key>` |
+| `CORS_ORIGINS` | Comma-separated allowed origins | `https://app.tracetrail.in,http://localhost:3000` |
+| `ENVIRONMENT` | Environment name | `production`, `development`, `staging` |
+| `DEBUG` | Enable debug mode | `true`/`false` |
+| `SHOW_DOCS` | Toggle FastAPI docs | `true`/`false` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access token TTL | `15` (default) |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | Refresh token TTL | `7` (default) |
+| `EXTENSION_ENABLED` | Feature flag for extension routes | `false` |
+| `EXTENSION_WEBSOCKET_ENABLED` | Enable WebSocket endpoint | `false` |
+| `EXTENSION_RATE_LIMIT` | Requests per minute for extension | `100` |
+
+**OAuth Provider Credentials** (if configured):
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `INSTAGRAM_CLIENT_ID`, `INSTAGRAM_CLIENT_SECRET`
+- `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET`
+- `TWITTER_CLIENT_ID`, `TWITTER_CLIENT_SECRET`
+
+#### AI Module Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `AI_API_PORT` | Port for standalone FastAPI service | `8100` |
+| `MODEL_CONFIG_PATH` | Path to model configuration JSON | `config/model_config.json` |
+| `DATASET_PATH` | Base directory for datasets | `data/datasets/` |
+| `LOG_LEVEL` | Logging verbosity | `INFO` |
 
 ### DNS Configuration
 
@@ -399,34 +446,85 @@ backend/
 
 ## API Endpoints
 
+### Base URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://api.tracetrail.in` |
+| Local | `http://localhost:8000` |
+
 ### Authentication
-- `POST /auth/login` - User login
+
+- `POST /auth/login` - User login (returns access + refresh tokens)
 - `POST /auth/register` - User registration
 - `POST /auth/refresh` - Refresh JWT token
+- `POST /auth/logout` - Logout (optional, clears tokens)
+
+**Authentication**: JWT Bearer tokens in `Authorization: Bearer <token>` header
 
 ### OAuth
+
 - `GET /auth/{provider}/redirect` - Get OAuth redirect URL
+  - Providers: `google`, `instagram`, `facebook`, `twitter`
 - `GET /auth/{provider}/callback` - OAuth callback handler
 
 ### Accounts
+
 - `GET /accounts` - Get user's connected accounts
 - `POST /accounts/{provider}/disconnect` - Disconnect account
 
 ### Sync
+
 - `POST /sync/{provider}` - Sync specific provider
 - `POST /sync/all` - Sync all connected accounts
 
 ### Dashboard
-- `GET /dashboard/summary` - Dashboard summary data
+
+- `GET /dashboard/summary` - Dashboard summary data (metrics, health, trends)
 - `GET /dashboard/signals` - Security signals
 - `GET /dashboard/anomalies` - Detected anomalies
-- `GET /dashboard/insights` - Insights
+- `GET /dashboard/insights` - Insights and recommendations
 
 ### Health
+
 - `GET /health` - Health check endpoint
+  - Returns: `{"status": "healthy", "timestamp": "...", "version": "2.0.0", "environment": "production"}`
 - `GET /system-health` - System health details
 
-**API Documentation**: `https://api.tracetrail.in/docs` (Swagger UI)
+### Response Format
+
+All API responses follow this envelope:
+
+```json
+{
+  "status": "success",
+  "data": {},
+  "meta": {
+    "requestId": "uuid",
+    "timestamp": "ISO8601"
+  }
+}
+```
+
+Errors return `status="error"` with an `error` object.
+
+### Rate Limiting
+
+- Default: 60 requests/minute per access token
+- Extension routes: Respect `EXTENSION_RATE_LIMIT` (default: 100/minute)
+- Exceeding limit: HTTP 429 with `Retry-After` header
+
+### Common Headers
+
+| Header | Description |
+|--------|-------------|
+| `Authorization` | `Bearer <access_token>` |
+| `X-Request-Id` | Optional request ID for tracing |
+| `X-API-Version` | Optional API version |
+| `Content-Type` | `application/json` |
+
+**API Documentation**: `https://api.tracetrail.in/docs` (Swagger UI)  
+**Postman Collection**: `docs/api/postman_collection.json`
 
 ---
 
@@ -487,22 +585,56 @@ backend/
 ## Security Features
 
 ### Authentication & Authorization
-- JWT-based authentication
-- Token expiration (15 minutes access, 7 days refresh)
-- Secure password hashing (bcrypt)
-- Role-based access control (future)
+
+**JWT-Based Authentication**:
+- Access tokens: Short-lived (15-30 minutes, configurable)
+- Refresh tokens: Long-lived (7-30 days, configurable)
+- Token storage: localStorage or HTTP-only cookies (future)
+- Token refresh: Automatic via `/auth/refresh` endpoint
+
+**Password Security**:
+- Hashing: bcrypt with salt rounds
+- Password policy:
+  - Minimum 12 characters
+  - At least one uppercase, lowercase, number, and special character
+  - Enforced via Pydantic validators
+
+**Route Protection**:
+- `Depends(get_current_user)` for protected routes
+- Role-based access control (future: `require_role("admin")`)
 
 ### Data Protection
-- OAuth tokens encrypted at rest (Fernet symmetric encryption)
-- HTTPS for all communications
-- CORS restrictions
-- Environment variable secrets management
+
+**Token Encryption**:
+- OAuth tokens encrypted at rest using Fernet symmetric encryption
+- Encryption key stored in `ENCRYPTION_KEY` environment variable
+- Tokens decrypted only when needed for API calls
+
+**Communication Security**:
+- HTTPS enforced for all production traffic
+- Automatic SSL certificates via Vercel and Render
+- CORS restrictions to trusted origins only
+
+**Secrets Management**:
+- Environment variables stored securely in platform dashboards
+- Never committed to repository
+- Rotated regularly
 
 ### Security Headers
-- Content Security Policy
-- X-Frame-Options
-- X-Content-Type-Options
-- Strict-Transport-Security
+
+- Content Security Policy (CSP)
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- Strict-Transport-Security (HSTS)
+- X-XSS-Protection
+
+### OAuth Security
+
+- State token validation (JWT with user ID)
+- PKCE support where available
+- Secure token storage (encrypted)
+- Automatic token refresh
+- Scope validation
 
 ---
 
@@ -585,17 +717,96 @@ npm run test:e2e
 
 ---
 
+## Component Architecture Details
+
+### Frontend Components
+
+**Layout Components** (`components/layout/`):
+- `AppShell.tsx` - Main application wrapper
+- `TopNavbar.tsx` - Top navigation with search, theme toggle, notifications
+- `SidebarDrawer.tsx` - Mobile/tablet sidebar drawer
+- `NavSidebar.tsx` - Navigation sidebar
+
+**Dashboard Components** (`components/dashboard/`):
+- `DashboardOverview.tsx` - Main dashboard view
+- `MetricCard.tsx` - Metric display cards
+- `TrendCard.tsx` - Trend visualization cards
+- `TrendChart.tsx` - Time-series charts (Recharts)
+
+**Account Management** (`components/accounts/`):
+- `ConnectedAccounts.tsx` - Account connection management
+- `ProviderCard.tsx` - Individual OAuth provider card
+
+**System Health** (`components/system-health/`):
+- `HealthCore.tsx` - 3D health visualization widget
+- `HealthModal.tsx` - Detailed health breakdown modal
+- `HealthTooltip.tsx` - Health score tooltip
+
+**UI Primitives** (`components/ui/`):
+- `Badge.tsx` - Badge component
+- `Modal.tsx` - Modal dialog
+- `Tooltip.tsx` - Tooltip component
+
+### Backend Services
+
+**Service Layer** (`src/app/services/`):
+- `sync_service.py` - OAuth account synchronization
+- `health_service.py` - Health score calculation
+- `activity_service.py` - Activity logging
+
+**OAuth Clients** (`src/app/oauth/`):
+- `base.py` - Base OAuth client interface
+- `google.py` - Google OAuth 2.0 implementation
+- `instagram.py` - Instagram Basic Display API
+- `facebook.py` - Facebook Graph API
+- `twitter.py` - Twitter OAuth 2.0 implementation
+
 ## Documentation Index
 
-- **Getting Started**: `docs/getting_started.md`
-- **System Architecture**: `docs/architecture/system_architecture.md`
-- **Frontend Implementation**: `docs/FRONTEND_IMPLEMENTATION.md`
-- **Backend Implementation**: `docs/BACKEND_IMPLEMENTATION.md`
-- **API Specification**: `docs/API_SPECIFICATION.md`
-- **Database Schema**: `docs/DATABASE_SCHEMA.md`
-- **Deployment Guide**: `docs/deployment/production_deployment.md`
-- **Project Status**: `docs/PROJECT_STATUS.md`
-- **Complete System Overview**: `docs/COMPLETE_SYSTEM_OVERVIEW.md`
+### Getting Started
+- **Getting Started**: `docs/getting_started.md` - Local development setup
+- **Full Run Guide**: `docs/TraceTrail-Full-Run-Guide.md` - End-to-end demo guide
+
+### Architecture & Design
+- **System Architecture**: `docs/architecture/system_architecture.md` - Component interactions
+- **Technology Stack**: `docs/architecture/technology_stack.md` - Technology choices
+- **API Design**: `docs/architecture/api_design.md` - API design principles
+- **Database Schema**: `docs/architecture/database_schema.md` - Database structure
+
+### Implementation Details
+- **Frontend Implementation**: `docs/FRONTEND_IMPLEMENTATION.md` - Complete frontend details
+- **Backend Implementation**: `docs/BACKEND_IMPLEMENTATION.md` - Complete backend details
+- **API Specification**: `docs/API_SPECIFICATION.md` - Complete API documentation
+- **Database Schema**: `docs/DATABASE_SCHEMA.md` - Database structure and relationships
+
+### Deployment
+- **Production Deployment**: `docs/deployment/production_deployment.md` - Current production setup
+- **Deployment Overview**: `docs/deployment/deployment_overview.md` - General concepts
+- **Frontend Deployment**: `docs/deployment/frontend_deployment.md` - Frontend specifics
+- **Backend Deployment**: `docs/deployment/backend_deployment.md` - Backend specifics
+- **Environment Variables**: `docs/deployment/environment_variables.md` - Configuration reference
+
+### Module-Specific
+- **AI Module Setup**: `docs/ai_module/ai_setup.md` - AI module setup guide
+- **Risk Algorithm**: `docs/ai_module/risk_algorithm_explanation.md` - Risk scoring details
+- **Recommendation Engine**: `docs/ai_module/recommendation_engine.md` - Recommendation system
+- **Frontend Setup**: `docs/frontend/frontend_setup.md` - Frontend development guide
+- **Component Documentation**: `docs/frontend/component_documentation.md` - Component reference
+- **Backend Setup**: `docs/backend/backend_setup.md` - Backend development guide
+- **Authentication Guide**: `docs/backend/authentication_guide.md` - Auth implementation
+
+### API Documentation
+- **API Overview**: `docs/api/api_overview.md` - API summary
+- **Authentication Endpoints**: `docs/api/authentication_endpoints.md` - Auth endpoints
+- **Dashboard Endpoints**: `docs/api/dashboard_endpoints.md` - Dashboard endpoints
+- **Analysis Endpoints**: `docs/api/analysis_endpoints.md` - Analysis endpoints
+- **Postman Collection**: `docs/api/postman_collection.json` - Postman import file
+
+### Project Management
+- **Project Status**: `docs/PROJECT_STATUS.md` - Current status and roadmap
+- **Complete System Overview**: `docs/COMPLETE_SYSTEM_OVERVIEW.md` - Comprehensive overview
+- **Documentation Index**: `docs/DOCUMENTATION_INDEX.md` - Documentation navigation
+- **Contributing**: `docs/contributing.md` - Contribution guidelines
 
 ---
 
